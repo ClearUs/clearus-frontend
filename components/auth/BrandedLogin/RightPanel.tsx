@@ -11,6 +11,7 @@ interface RightPanelProps {
     showPassword: boolean;
     password: string;
     errorMsg: string;
+    isLoading?: boolean;
     institution: Institution;
     handleFormSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
     setEmail: (value: string) => void;
@@ -21,19 +22,20 @@ interface RightPanelProps {
 }
 
 export default function RightPanel({ 
-    code, 
-    studentDomain, 
-    institution, 
-    email, 
-    showPassword, 
-    password, 
-    errorMsg, 
-    handleFormSubmit, 
-    setEmail, 
-    handleDomainPillClick, 
-    setErrorMsg, 
-    setPassword, 
-    setShowPassword 
+    code,
+    studentDomain,
+    institution,
+    email,
+    showPassword,
+    password,
+    errorMsg,
+    isLoading = false,
+    handleFormSubmit,
+    setEmail,
+    handleDomainPillClick,
+    setErrorMsg,
+    setPassword,
+    setShowPassword
 }: RightPanelProps) {
 
     // Dynamic state compiler for real-time validation feedback loop
@@ -156,9 +158,10 @@ export default function RightPanel({
 
                     <button
                         type="submit"
-                        className="w-full py-3 bg-green-500 hover:bg-green-400 font-bold text-black rounded-xl transition-colors text-xs tracking-widest uppercase shadow-lg shadow-green-500/10 cursor-pointer"
+                        disabled={isLoading}
+                        className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-black rounded-xl transition-colors text-xs tracking-widest uppercase shadow-lg shadow-green-500/10 cursor-pointer"
                     >
-                        Sign In
+                        {isLoading ? 'Authenticating...' : 'Sign In'}
                     </button>
                 </form>
 

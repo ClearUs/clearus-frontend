@@ -21,7 +21,7 @@ export default function StaffSidebar({
 }: SidebarProps) {
   
   const sections = [
-    { id: 'clearance_queue', label: 'Clearance Queue', icon: CheckSquare, badge: '28' },
+    { id: 'clearance_queue', label: 'Clearance Queue', icon: CheckSquare },
     { id: 'verification_desk', label: 'Clearance Verification Desk', icon: FileCheck },
     { id: 'org_units', label: 'Organizational Units', icon: Building, hasChevron: true },
     { id: 'workflow_studio', label: 'Workflow Studio', icon: GitBranch, hasChevron: true },
@@ -73,11 +73,6 @@ export default function StaffSidebar({
                   <Icon className="w-4 h-4 ]" />
                   <span className="truncate">{sec.label}</span>
                 </span>
-                {sec.badge && (
-                  <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold">
-                    {sec.badge}
-                  </span>
-                )}
                 {sec.hasChevron && <span className="text-white/20 text-[9px] font-mono">▶</span>}
               </button>
             );

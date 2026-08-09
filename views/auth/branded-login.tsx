@@ -18,6 +18,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [resolvedRole, setResolvedRole] = useState<User['role']>('staff');
 
     const staffDomain = institution.allowedDomains[0];
@@ -29,64 +30,73 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
         setErrorMsg('');
     };
 
-    const handleFormSubmit = (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
-        const domainPart = email.trim().split('@')[1];
-
-        if (!domainPart || !institution.allowedDomains.includes(domainPart.toLowerCase())) {
-            setErrorMsg(`Access Rejected: The email domain is not authorized for ${institution.shortName}. Please sign in with your official university account.`);
-            return;
-        }
-        
         setErrorMsg('');
-        // The email domain determines the role: the student subdomain -> student,
-        // anything else on the allow-list -> staff.
-        setResolvedRole(domainPart.toLowerCase() === studentDomain.toLowerCase() ? 'student' : 'staff');
-        // Shift view state directly into MFA canvas sequence
-        setCurrentSubView('two-factor');
+        setIsLoading(true);
+
+        const username = email.trim().split('@')[0];
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                setErrorMsg(data.detail || 'Invalid credentials. Please try again.');
+                setIsLoading(false);
+                return;
+            }
+
+            const domainPart = email.trim().split('@')[1];
+            const role = domainPart?.toLowerCase() === studentDomain.toLowerCase() ? 'student' : 'staff';
+            setResolvedRole(role);
+            setCurrentSubView('two-factor');
+        } catch {
+            setErrorMsg('Network error. The authentication server may be starting up — please try again in a moment.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleMfaAuthenticationSuccess = () => {
-        // BACKEND SEAM: the mock session is a client cookie the server guard reads
-        // (see lib/session.ts). Replace this with a login API that sets an
-        // httpOnly session cookie server-side; the redirect below stays the same.
-        document.cookie = `cu_role=${resolvedRole}; path=/; samesite=lax`;
-        // Authenticated profile confirmation; route to the role-scoped workspace.
         router.push(`/${resolvedRole}/${institution.code.toLowerCase()}`);
     };
 
     return (
         <div className="w-full flex flex-col md:flex-row min-h-145 border border-white/5 rounded-2xl overflow-hidden bg-[#070707] shadow-2xl relative">
-            
-            {/* LEFT SIDEBAR PANEL: Persistent Identity Shield */}
-            <LeftPanel 
-                code={institution.code} 
-                name={institution.name} 
-                motto={institution.motto} 
+
+            <LeftPanel
+                code={institution.code}
+                name={institution.name}
+                motto={institution.motto}
                 staffDomain={staffDomain}
-                bannerGradient={institution.colorTheme.bannerGradient} 
-                studentDomain={studentDomain} 
+                bannerGradient={institution.colorTheme.bannerGradient}
+                studentDomain={studentDomain}
             />
 
-            {/* RIGHT WORKACTION PANEL: Conditional Form / MFA render loops */}
             {currentSubView === 'login' ? (
-                <RightPanel 
-                    code={institution.code} 
-                    studentDomain={studentDomain} 
-                    institution={institution} 
-                    email={email} 
-                    showPassword={showPassword} 
-                    password={password} 
-                    errorMsg={errorMsg} 
-                    handleFormSubmit={handleFormSubmit} 
-                    setEmail={setEmail} 
-                    handleDomainPillClick={handleDomainPillClick} 
-                    setErrorMsg={setErrorMsg} 
-                    setPassword={setPassword} 
-                    setShowPassword={setShowPassword} 
+                <RightPanel
+                    code={institution.code}
+                    studentDomain={studentDomain}
+                    institution={institution}
+                    email={email}
+                    showPassword={showPassword}
+                    password={password}
+                    errorMsg={errorMsg}
+                    isLoading={isLoading}
+                    handleFormSubmit={handleFormSubmit}
+                    setEmail={setEmail}
+                    handleDomainPillClick={handleDomainPillClick}
+                    setErrorMsg={setErrorMsg}
+                    setPassword={setPassword}
+                    setShowPassword={setShowPassword}
                 />
             ) : (
-                <MfaPanel 
+                <MfaPanel
                     code={institution.code}
                     onBackToLogin={() => setCurrentSubView('login')}
                     onMfaSuccess={handleMfaAuthenticationSuccess}

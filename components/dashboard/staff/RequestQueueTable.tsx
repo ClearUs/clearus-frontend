@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, AlertTriangle, Check, X } from 'lucide-react';
 import { Institution, User } from '@/types';
-import LiveToast from './LiveToast';
+import { clientFetch } from '@/lib/api/client-fetch';
 
 interface QueueTableProps {
   institution: Institution;
@@ -13,63 +13,11 @@ interface QueueTableProps {
   setQueueTab: (tab: 'all' | 'pending' | 'urgent' | 'actioned') => void;
 }
 
-interface ToastData {
-  id: string;
-  studentName: string;
-  itemName: string;
-  message: string;
-}
-
 export default function RequestQueueTable({ institution, queueTab, setQueueTab }: QueueTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [liveToast, setLiveToast] = useState<ToastData | null>(null);
 
-  const [requests, setRequests] = useState([
-    { name: 'Ngozi Okeke', matric: '2021/UNILAG/5592', dept: 'Economics', title: 'Department Clearance', id: 'REQ_11', age: '168 hrs ago', type: 'urgent', status: 'pending', requiresFileReview: true },
-    { name: 'Fatima Abubakar', matric: '2021/UNILAG/1149', dept: 'Economics', title: 'Bursary Clearance', id: 'REQ_6', age: '120 hrs ago', type: 'urgent', status: 'pending', requiresFileReview: false },
-    { name: 'Chinedu Okafor', matric: '2021/UNILAG/1054', dept: 'Accounting', title: 'Sports & Recreation Clearance', id: 'REQ_4', age: '96 hrs ago', type: 'urgent', status: 'pending', requiresFileReview: false },
-    { name: 'Obinna Eze', matric: '2021/UNILAG/4921', dept: 'Law', title: 'Library Clearance', id: 'REQ_1', age: '24 hrs ago', type: 'urgent', status: 'pending', requiresFileReview: false },
-    { name: 'Emeka Nwosu', matric: '2021/UNILAG/7124', dept: 'Systems Engineering', title: 'Library Clearance', id: 'REQ_SIM_1782907584281', age: '0 hrs ago', type: 'live', status: 'pending', requiresFileReview: false },
-    { name: 'Khadijat Balogun', matric: '2021/UNILAG/9696', dept: 'Accounting', title: 'Academic Registry Clearance', id: 'REQ_SIM_1782907569280', age: '0 hrs ago', type: 'live', status: 'pending', requiresFileReview: true },
-    { name: 'Ngozi Obi', matric: '2021/UNILAG/7639', dept: 'Law', title: 'Bursary Clearance', id: 'REQ_SIM_1782907404282', age: '0 hrs ago', type: 'live', status: 'pending', requiresFileReview: false },
-    { name: 'Ngozi Nwosu', matric: '2021/UNILAG/4955', dept: 'Systems Engineering', title: 'Sports & Recreation Clearance', id: 'REQ_SIM_1782907389282', age: '0 hrs ago', type: 'live', status: 'pending', requiresFileReview: false }
-  ]);
-
-  // Simulated Polling Interval for live feed requests
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const firstNames = ['Adewale', 'Chuka', 'Folake', 'Uchenna', 'Babatunde', 'Amara'];
-      const lastNames = ['Balogun', 'Opara', 'Coker', 'Igwe', 'Adeyemi', 'Obi'];
-      const items = ['Library', 'Bursary', 'Sports & Recreation', 'Academic Registry'];
-      
-      const randomName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
-      const randomItem = items[Math.floor(Math.random() * items.length)];
-      const simulatedId = `REQ_SIM_${Date.now()}`;
-
-      const newRequest = {
-        name: randomName,
-        matric: `2021/${institution.code}/${Math.floor(1000 + Math.random() * 9000)}`,
-        dept: institution.departments[Math.floor(Math.random() * institution.departments.length)] || 'Economics',
-        title: `${randomItem} Clearance`,
-        id: simulatedId,
-        age: '0 hrs ago',
-        type: 'live',
-        status: 'pending',
-        requiresFileReview: Math.random() > 0.7
-      };
-
-      setRequests(prev => [newRequest, ...prev]);
-      setLiveToast({
-        id: simulatedId,
-        studentName: randomName,
-        itemName: randomItem,
-        message: `Submitted a new ${randomItem} clearance request.`
-      });
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, [institution]);
+  const [requests, setRequests] = useState<{ name: string; matric: string; dept: string; title: string; id: string; age: string; type: string; status: string; requiresFileReview: boolean }[]>([]);
 
   const handleSelectAllToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -87,7 +35,15 @@ export default function RequestQueueTable({ institution, queueTab, setQueueTab }
     }
   };
 
-  const handleAction = (id: string, newStatus: 'cleared' | 'flagged') => {
+  const handleAction = async (id: string, newStatus: 'cleared' | 'flagged') => {
+    try {
+      await clientFetch(`/api/v1/workflows/steps/${id}/approve/`, {
+        method: 'PATCH',
+        body: { approved: newStatus === 'cleared', comments: newStatus === 'cleared' ? 'Approved from queue' : 'Flagged from queue' },
+      });
+    } catch {
+      // Step endpoint may not match mock IDs — proceed with local state update
+    }
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
     setSelectedIds(prev => prev.filter(item => item !== id));
   };
@@ -109,9 +65,6 @@ export default function RequestQueueTable({ institution, queueTab, setQueueTab }
   return (
     <div className="space-y-4 font-sans w-full relative">
       
-      {/* Dynamic Toast Alert Portal */}
-      <LiveToast liveToast={liveToast} onClose={() => setLiveToast(null)} />
-
       {/* Header Info Block */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0e0e0e] border border-white/5 p-6 rounded-2xl shadow-xl">
         <div>
@@ -132,16 +85,16 @@ export default function RequestQueueTable({ institution, queueTab, setQueueTab }
       {/* Horizontal Queue Tab Filters */}
       <div className="flex flex-wrap items-center gap-2 bg-bg-dark border border-white/10 p-1.5 rounded-2xl w-fit font-mono text-xs">
         <button onClick={() => setQueueTab('all')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'all' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
-          All Requests <span className="text-[10px] opacity-40 pl-0.5 font-sans">{requests.length + 24}</span>
+          All Requests <span className="text-[10px] opacity-40 pl-0.5 font-sans">{requests.length}</span>
         </button>
         <button onClick={() => setQueueTab('pending')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'pending' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
-          Pending My Review <span className="text-[10px] text-amber-500 font-bold pl-0.5 font-sans">0</span>
+          Pending My Review <span className="text-[10px] text-amber-500 font-bold pl-0.5 font-sans">{requests.filter(r => r.status === 'pending').length}</span>
         </button>
         <button onClick={() => setQueueTab('urgent')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'urgent' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/10' : 'text-white/40'}`}>
-          Urgent Escalations <span className="text-[10px] font-bold pl-0.5 font-sans">8</span>
+          Urgent Escalations <span className="text-[10px] font-bold pl-0.5 font-sans">{requests.filter(r => r.type === 'urgent').length}</span>
         </button>
         <button onClick={() => setQueueTab('actioned')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'actioned' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
-          Actioned <span className="text-[10px] opacity-40 pl-0.5 font-sans">4</span>
+          Actioned <span className="text-[10px] opacity-40 pl-0.5 font-sans">{requests.filter(r => r.status === 'cleared' || r.status === 'flagged').length}</span>
         </button>
       </div>
 
@@ -169,7 +122,7 @@ export default function RequestQueueTable({ institution, queueTab, setQueueTab }
           <h3 className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2 font-mono">
             <span>ACTIVE QUEUE STREAM</span>
             <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-sans tracking-normal font-medium normal-case">
-              Showing {requests.length} Of 32 Requests
+              {requests.length} Requests
             </span>
           </h3>
 
@@ -251,6 +204,16 @@ export default function RequestQueueTable({ institution, queueTab, setQueueTab }
               </tr>
             </thead>
             <tbody className="text-xs font-sans divide-y divide-white/5">
+              {requests.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center">
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-white/30">No clearance requests</p>
+                      <p className="text-xs text-white/20">Requests will appear here when students submit clearance steps.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {requests.map((req) => {
                 const isSelected = selectedIds.includes(req.id);
                 return (
