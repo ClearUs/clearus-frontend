@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion';
 import UniversityCrest from '@/components/landing/UniversityCrest';
-import { Eye, EyeOff, Mail, ShieldAlert, Check, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, ShieldAlert, AlertCircle } from 'lucide-react';
 import { Institution } from '@/types';
 
 interface RightPanelProps {

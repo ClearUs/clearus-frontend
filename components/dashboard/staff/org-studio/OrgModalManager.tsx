@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { OrgNode } from '@/types';
 
 interface PendingMoveData {
@@ -46,8 +46,8 @@ export default function OrgModalManager({
   setNewNodeData,
   domainInput,
   setDomainInput,
-  workflowInput,
-  setWorkflowInput,
+  workflowInput: _workflowInput,
+  setWorkflowInput: _setWorkflowInput,
   onCreateUnit,
   isEditModalOpen,
   onCancelEdit,

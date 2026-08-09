@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Institution } from '@/types/index';
 import RadarSpinner from '@/components/redirect/RadarSpinner';
 import StepProgressionCard from '@/components/redirect/StepProgressionCard';

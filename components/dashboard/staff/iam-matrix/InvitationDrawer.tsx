@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Shield, AlertCircle, Building, Lock } from 'lucide-react';
-import { Institution, CapabilityMeta, OrgNode } from '@/types';
+import { X, Shield, AlertCircle, Building } from 'lucide-react';
+import { Institution, CapabilityMeta } from '@/types';
 import { createPortal } from 'react-dom';
 
 interface InvitationDrawerProps {

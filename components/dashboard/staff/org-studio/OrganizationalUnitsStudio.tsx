@@ -21,14 +21,13 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [activePane, setActivePane] = useState<'tree' | 'inspector'>('tree');
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
 
   const [pendingMove, setPendingMove] = useState<{ nodeId: string; newParentId: string | null; impact: { subUnits: number; accounts: number } } | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const [editNodeData, setEditNodeData] = useState<Partial<OrgNode>>({});
   const [newNodeData, setNewNodeData] = useState<Partial<OrgNode>>({
@@ -77,6 +76,7 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- data-fetching on mount; setState is inside the async callback, not synchronously in the effect
   useEffect(() => { fetchUnits(); }, [fetchUnits]);
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId) || null;

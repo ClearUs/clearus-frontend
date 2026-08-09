@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, AlertTriangle, Check, X } from 'lucide-react';
 import { Institution, User } from '@/types';
@@ -13,7 +13,7 @@ interface QueueTableProps {
   setQueueTab: (tab: 'all' | 'pending' | 'urgent' | 'actioned') => void;
 }
 
-export default function RequestQueueTable({ institution, queueTab, setQueueTab }: QueueTableProps) {
+export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 

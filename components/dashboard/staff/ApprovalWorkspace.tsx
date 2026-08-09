@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, FileText, Check, X, AlertTriangle, Download, 
-  Mail, Phone, Database, Server, Copy, RotateCw, RotateCcw, 
-  Compass, Move, Search, ShieldCheck, ZoomIn, ZoomOut, Maximize2, CreditCard
+import {
+  FileText, Download,
+  RotateCw, RotateCcw,
+  Move, Search, ShieldCheck, ZoomIn, ZoomOut, Maximize2, CreditCard
 } from 'lucide-react';
 import { Institution, VerificationSubmission } from '@/types';
-import { clientFetch, ClientApiError } from '@/lib/api/client-fetch';
+import { clientFetch } from '@/lib/api/client-fetch';
 
 interface ApprovalWorkspaceProps {
   institution: Institution;
   onOfficerAction: (id: string, action: 'cleared' | 'flagged', feedback?: string) => void;
 }
 
-export default function ApprovalWorkspace({ institution, onOfficerAction }: ApprovalWorkspaceProps) {
+export default function ApprovalWorkspace({ onOfficerAction }: ApprovalWorkspaceProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSubIndex, setSelectedSubIndex] = useState(0);
+  const [selectedSubIndex] = useState(0);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectDrawer, setShowRejectDrawer] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('');

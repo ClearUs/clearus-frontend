@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Users, GraduationCap, AtSign, Shield, FileCheck, Building } from 'lucide-react';
-import { OrgNode, Institution } from '@/types';
+import { OrgNode } from '@/types';
 
 interface OrgInspectorPanelProps {
   selectedNode: OrgNode | null;

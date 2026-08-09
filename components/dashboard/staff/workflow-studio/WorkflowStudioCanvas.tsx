@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Layout, Plus, Sliders } from 'lucide-react';
 import { Institution, WorkflowStep } from '@/types';
@@ -45,10 +45,12 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
       .catch(() => {});
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- resetting derived state when scope changes */
   useEffect(() => {
     setSteps([]);
     setSelectedStepId(null);
   }, [currentScope]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleDecoupleStep = (stepId: string) => {
     setSteps(prev => prev.map(step => {
