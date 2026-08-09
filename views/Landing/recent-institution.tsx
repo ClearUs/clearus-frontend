@@ -6,7 +6,7 @@ import UniversityCrest from '@/components/landing/UniversityCrest';
 import { Institution } from '@/types';
 
 
-export default function RecentInstitution({ recentCodes, setRecentCodes, handleSelectWithRecent }: { recentCodes: string[], setRecentCodes: React.Dispatch<React.SetStateAction<string[]>>, handleSelectWithRecent: (school: Institution) => void }) {
+export default function RecentInstitution({ recentCodes, setRecentCodes: _setRecentCodes, handleSelectWithRecent }: { recentCodes: string[], setRecentCodes: React.Dispatch<React.SetStateAction<string[]>>, handleSelectWithRecent: (school: Institution) => void }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}

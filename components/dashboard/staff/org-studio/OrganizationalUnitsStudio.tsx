@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Building, Plus } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Building, Plus, Loader2 } from 'lucide-react';
 import { Institution, OrgNode } from '@/types';
+import { clientFetch, ClientApiError } from '@/lib/api/client-fetch';
+import { flattenUnitTree, orgNodeToCreatePayload } from '@/lib/api/mappers';
+import type { UnitNode, UnitDetail } from '@/lib/api/types';
 import OrgTreePanel from './OrgTreePanel';
 import OrgInspectorPanel from './OrgInspectorPanel';
 import OrgModalManager from './OrgModalManager';
@@ -11,33 +14,20 @@ interface OrganizationalUnitsStudioProps {
   institution: Institution;
 }
 
-const getInitialOrgData = (institutionCode: string): OrgNode[] => {
-  const code = institutionCode.toLowerCase();
-  return [
-    { id: 'science', name: 'Faculty of Science', type: 'faculty', staffCount: 34, studentCount: 1450, allowedDomains: [`*science.${code}.edu.ng`], boundWorkflows: ['Faculty Board Clearance', 'Academic Integrity Verification'], parentId: null },
-    { id: 'physics', name: 'Dept of Physics', type: 'department', staffCount: 12, studentCount: 240, allowedDomains: [`*physics.${code}.edu.ng`], boundWorkflows: ['Lab Equipment Signing', 'Undergraduate Seminar Clearance'], parentId: 'science' },
-    { id: 'comp-sci', name: 'Dept of Computer Science', type: 'department', staffCount: 8, studentCount: 412, allowedDomains: [`*cs.${code}.edu.ng`], boundWorkflows: ['Thesis Document Verification', 'Degree Progress Review'], parentId: 'science' },
-    { id: 'bursary-div', name: 'Bursary Division', type: 'division', staffCount: 18, allowedDomains: [`*bursary.${code}.edu.ng`], boundWorkflows: ['School Fees Final Clearance Audit'], parentId: null },
-    { id: 'student-accounts', name: 'Student Accounts Desk', type: 'desk', staffCount: 4, allowedDomains: [`*accounts.${code}.edu.ng`], boundWorkflows: ['Graduation Handbook Fee Clearance', 'Outstanding Bill Verification'], parentId: 'bursary-div' },
-    { id: 'engineering', name: 'Faculty of Engineering', type: 'faculty', staffCount: 45, studentCount: 1890, allowedDomains: [`*eng.${code}.edu.ng`], boundWorkflows: ['Faculty Dues Verification', 'Workshop Safety Clearance'], parentId: null },
-    { id: 'mech-eng', name: 'Dept of Mechanical Engineering', type: 'department', staffCount: 15, studentCount: 510, allowedDomains: [`*mech.${code}.edu.ng`], boundWorkflows: ['Machinery Lab Handover Check'], parentId: 'engineering' }
-  ];
-};
-
 export default function OrganizationalUnitsStudio({ institution }: OrganizationalUnitsStudioProps) {
   const [nodes, setNodes] = useState<OrgNode[]>([]);
-  const [selectedNodeId, setSelectedNodeId] = useState<string>('comp-sci');
-  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({
-    'science': true, 'bursary-div': true, 'engineering': true
-  });
+  const [selectedNodeId, setSelectedNodeId] = useState<string>('');
+  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [activePane, setActivePane] = useState<'tree' | 'inspector'>('tree');
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
 
   const [pendingMove, setPendingMove] = useState<{ nodeId: string; newParentId: string | null; impact: { subUnits: number; accounts: number } } | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const [editNodeData, setEditNodeData] = useState<Partial<OrgNode>>({});
   const [newNodeData, setNewNodeData] = useState<Partial<OrgNode>>({
@@ -47,23 +37,47 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
   const [domainInput, setDomainInput] = useState('');
   const [workflowInput, setWorkflowInput] = useState('');
 
-  useEffect(() => {
-    const storageKey = `clearus_${institution.code}_org_nodes`;
-    const cached = localStorage.getItem(storageKey);
-    if (cached) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only hydration from localStorage; must run in an effect to avoid an SSR hydration mismatch
-      try { setNodes(JSON.parse(cached)); } catch { setNodes(getInitialOrgData(institution.code)); }
-    } else {
-      const initial = getInitialOrgData(institution.code);
-      setNodes(initial);
-      localStorage.setItem(storageKey, JSON.stringify(initial));
-    }
-  }, [institution]);
+  const fetchUnits = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const tree = await clientFetch<UnitNode[]>('/api/v1/iam/units/tree/', { method: 'GET' });
+      const flat = flattenUnitTree(tree);
 
-  const saveNodes = (updated: OrgNode[]) => {
-    setNodes(updated);
-    localStorage.setItem(`clearus_${institution.code}_org_nodes`, JSON.stringify(updated));
-  };
+      const enriched = await Promise.all(
+        flat.map(async (node) => {
+          try {
+            const detail = await clientFetch<UnitDetail>(`/api/v1/iam/units/${node.id}/detail/`, { method: 'GET' });
+            return {
+              ...node,
+              staffCount: detail.total_staff,
+              studentCount: detail.students_capacity > 0 ? detail.students_capacity : undefined,
+              boundWorkflows: detail.bound_clearance_processes?.map((p: unknown) =>
+                typeof p === 'string' ? p : (p as { name?: string })?.name ?? 'Workflow'
+              ) ?? [],
+            };
+          } catch {
+            return node;
+          }
+        })
+      );
+
+      setNodes(enriched);
+      if (enriched.length > 0) {
+        setSelectedNodeId(enriched[0].id);
+        const rootIds = enriched.filter(n => n.parentId === null).reduce((acc, n) => ({ ...acc, [n.id]: true }), {} as Record<string, boolean>);
+        setExpandedNodes(rootIds);
+      }
+    } catch (err) {
+      const message = err instanceof ClientApiError ? err.message : 'Failed to load organizational units.';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- data-fetching on mount; setState is inside the async callback, not synchronously in the effect
+  useEffect(() => { fetchUnits(); }, [fetchUnits]);
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId) || null;
 
@@ -103,58 +117,93 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
     setDragOverNodeId(null);
     const nodeId = e.dataTransfer.getData('text/plain') || draggedNodeId;
     if (!nodeId || nodeId === targetParentId) return;
-
     if (targetParentId && isDescendant(nodeId, targetParentId)) return;
 
     const subUnits = countDescendants(nodeId);
     const accounts = calculateStudentStaffImpact(nodeId);
-
     setPendingMove({ nodeId, newParentId: targetParentId, impact: { subUnits, accounts } });
     setDraggedNodeId(null);
   };
 
-  const executeMove = () => {
+  const executeMove = async () => {
     if (!pendingMove) return;
-    const updated = nodes.map(n => n.id === pendingMove.nodeId ? { ...n, parentId: pendingMove.newParentId } : n);
-    saveNodes(updated);
-    if (pendingMove.newParentId) setExpandedNodes(prev => ({ ...prev, [pendingMove.newParentId!]: true }));
-    setPendingMove(null);
+    setIsSaving(true);
+    try {
+      await clientFetch(`/api/v1/iam/units/${pendingMove.nodeId}/`, {
+        method: 'PATCH',
+        body: { parent_id: pendingMove.newParentId },
+      });
+      const updated = nodes.map(n => n.id === pendingMove.nodeId ? { ...n, parentId: pendingMove.newParentId } : n);
+      setNodes(updated);
+      if (pendingMove.newParentId) setExpandedNodes(prev => ({ ...prev, [pendingMove.newParentId!]: true }));
+    } catch (err) {
+      alert(err instanceof ClientApiError ? err.message : 'Failed to move unit.');
+    } finally {
+      setPendingMove(null);
+      setIsSaving(false);
+    }
   };
 
-  const handleCreateUnit = () => {
+  const handleCreateUnit = async () => {
     if (!newNodeData.name?.trim()) return;
-    const randomId = 'unit_' + Math.random().toString(36).substring(2, 9);
-    const node: OrgNode = {
-      id: randomId,
-      name: newNodeData.name.trim(),
-      type: newNodeData.type || 'department',
-      staffCount: Number(newNodeData.staffCount) || 0,
-      studentCount: newNodeData.type === 'faculty' || newNodeData.type === 'department' ? (Number(newNodeData.studentCount) || 0) : undefined,
-      allowedDomains: newNodeData.allowedDomains || [],
-      boundWorkflows: newNodeData.boundWorkflows || [],
-      parentId: newNodeData.parentId || null
-    };
+    setIsSaving(true);
+    try {
+      const payload = orgNodeToCreatePayload(newNodeData);
+      const created = await clientFetch<UnitNode>('/api/v1/iam/units/', {
+        method: 'POST',
+        body: payload,
+      });
 
-    saveNodes([...nodes, node]);
-    setSelectedNodeId(randomId);
-    setIsAddModalOpen(false);
-    setNewNodeData({ name: '', type: 'department', staffCount: 5, studentCount: 100, allowedDomains: [], boundWorkflows: [] });
+      const node: OrgNode = {
+        id: created.id,
+        name: created.name,
+        type: newNodeData.type || 'department',
+        staffCount: 0,
+        studentCount: newNodeData.type === 'faculty' || newNodeData.type === 'department' ? 0 : undefined,
+        allowedDomains: newNodeData.allowedDomains || [],
+        boundWorkflows: newNodeData.boundWorkflows || [],
+        parentId: newNodeData.parentId || null,
+      };
+
+      setNodes(prev => [...prev, node]);
+      setSelectedNodeId(node.id);
+      setIsAddModalOpen(false);
+      setNewNodeData({ name: '', type: 'department', staffCount: 5, studentCount: 100, allowedDomains: [], boundWorkflows: [] });
+    } catch (err) {
+      alert(err instanceof ClientApiError ? err.message : 'Failed to create unit.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleUpdateUnit = () => {
+  const handleUpdateUnit = async () => {
     if (!editNodeData.id || !editNodeData.name?.trim()) return;
-    const updated = nodes.map(n => n.id === editNodeData.id ? {
-      ...n,
-      name: editNodeData.name!.trim(),
-      type: editNodeData.type!,
-      staffCount: Number(editNodeData.staffCount) || 0,
-      studentCount: editNodeData.type === 'faculty' || editNodeData.type === 'department' ? Number(editNodeData.studentCount) || 0 : undefined,
-      allowedDomains: editNodeData.allowedDomains || [],
-      boundWorkflows: editNodeData.boundWorkflows || []
-    } as OrgNode : n);
+    setIsSaving(true);
+    try {
+      await clientFetch(`/api/v1/iam/units/${editNodeData.id}/`, {
+        method: 'PATCH',
+        body: {
+          name: editNodeData.name.trim(),
+          unit_type: editNodeData.type === 'faculty' ? 'academic' : editNodeData.type === 'division' ? 'non-academic' : editNodeData.type,
+        },
+      });
 
-    saveNodes(updated);
-    setIsEditModalOpen(false);
+      setNodes(prev => prev.map(n => n.id === editNodeData.id ? {
+        ...n,
+        name: editNodeData.name!.trim(),
+        type: editNodeData.type!,
+        staffCount: Number(editNodeData.staffCount) || 0,
+        studentCount: editNodeData.type === 'faculty' || editNodeData.type === 'department' ? Number(editNodeData.studentCount) || 0 : undefined,
+        allowedDomains: editNodeData.allowedDomains || [],
+        boundWorkflows: editNodeData.boundWorkflows || []
+      } as OrgNode : n));
+
+      setIsEditModalOpen(false);
+    } catch (err) {
+      alert(err instanceof ClientApiError ? err.message : 'Failed to update unit.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteUnit = (id: string) => {
@@ -168,14 +217,36 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
     gatherIds(id);
 
     const updated = nodes.filter(n => !idsToRemove.has(n.id));
-    saveNodes(updated);
+    setNodes(updated);
     setSelectedNodeId(updated[0]?.id || '');
   };
 
+  if (isLoading) {
+    return (
+      <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 h-162.5 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-white/40 text-sm">
+          <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
+          <span>Loading organizational units...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 h-162.5 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <p className="text-rose-400 text-sm">{error}</p>
+          <button onClick={fetchUnits} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white rounded-xl cursor-pointer">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 overflow-hidden flex flex-col h-162.5 shadow-2xl relative z-10">
-
-      {/* Dynamic Upper Header Action Row */}
       <div className="bg-[#0c0c0c] px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -204,7 +275,6 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
         </button>
       </div>
 
-      {/* Grid Canvas Shell Splits */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
         <div className="lg:col-span-7 border-r border-white/10 h-full overflow-hidden">
           <OrgTreePanel
@@ -225,7 +295,6 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
         </div>
       </div>
 
-      {/* Shared Modals Matrix Overlays Layer */}
       <OrgModalManager
         pendingMove={pendingMove}
         onCancelMove={() => setPendingMove(null)}

@@ -29,7 +29,7 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
         } catch (e) {
             console.error('Error reading recent schools', e);
         }
-    }, []);
+    }, [setRecentCodes]);
 
     // Real-time Database active validation check on typing
     useEffect(() => {

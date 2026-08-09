@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, RefreshCw, AlertCircle, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Lock, RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
 import UniversityCrest from '@/components/landing/UniversityCrest';
 
 interface MfaPanelProps {

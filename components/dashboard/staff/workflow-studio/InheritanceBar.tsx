@@ -10,7 +10,7 @@ interface InheritanceBarProps {
   setCurrentScope: (scope: 'parent' | 'child') => void;
 }
 
-export default function InheritanceBar({ institution, currentScope, setCurrentScope }: InheritanceBarProps) {
+export default function InheritanceBar({ institution: _institution, currentScope, setCurrentScope }: InheritanceBarProps) {
   return (
     <div className="bg-[#0e0e0e] border border-white/10 p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left">
       <div className="flex items-start gap-3">

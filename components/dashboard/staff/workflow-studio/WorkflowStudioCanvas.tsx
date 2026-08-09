@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Layout, Plus, Sliders } from 'lucide-react';
 import { Institution, WorkflowStep } from '@/types';
+import { clientFetch, ClientApiError } from '@/lib/api/client-fetch';
+import type { UnitNode, WorkflowTemplate } from '@/lib/api/types';
 
 import CanvasHeader from '@/components/dashboard/staff/workflow-studio/CanvasHeader';
 import InheritanceBar from '@/components/dashboard/staff/workflow-studio/InheritanceBar';
@@ -14,11 +16,6 @@ interface WorkflowStudioCanvasProps {
   institution: Institution;
 }
 
-const PARENT_STEPS_PRESET: WorkflowStep[] = [
-  { id: 'root-step-1', sequence: 1, title: 'Step 1: Library Clearance', unitName: 'Library Services Division', requirementType: 'DOCUMENT_UPLOAD', details: 'Verify return of all borrowed books and submit library clearance slip.', assignedOfficer: 'Dr. Agnes Chidi', requiredFileName: 'Library_Clearance_Slip.pdf', x: 80, y: 180, isInherited: true },
-  { id: 'root-step-2', sequence: 2, title: 'Step 2: Department Audit', unitName: 'Academic Directorate', requirementType: 'FORM_UPLOAD', details: 'Upload signed departmental handbook handover sheets.', assignedOfficer: 'Dr. Chuka Obi (HOD)', requiredFileName: 'Dept_Handover_Form_V2.pdf', x: 420, y: 180, isInherited: true },
-  { id: 'root-step-3', sequence: 3, title: 'Step 3: Bursary Clearing', unitName: 'Bursary & Student Accounts', requirementType: 'FEE_PAYMENT', details: 'Settle outstanding handbook levy, final semester dues, and structural balances.', assignedOfficer: 'Elder Samuel Nwachukwu', feeAmount: 15000, x: 760, y: 180, isInherited: true }
-];
 
 const REQUIREMENT_META_MAP = {
   DOCUMENT_UPLOAD: { label: 'Document Upload & Review', badge: 'DOCUMENT UPLOAD', icon: <span className="text-emerald-400">↑</span>, colorClass: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' },
@@ -31,27 +28,29 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
   const [currentScope, setCurrentScope] = useState<'parent' | 'child'>('child');
   const [steps, setSteps] = useState<WorkflowStep[]>([]);
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
-  
+
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [owningUnitId, setOwningUnitId] = useState<string | null>(null);
+
   const [draggingStepId, setDraggingStepId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [canvasScale, setCanvasScale] = useState(1);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (currentScope === 'parent') {
-      const parentStepsCopy = PARENT_STEPS_PRESET.map(s => ({ ...s, id: s.id.replace('root-', 'parent-'), isInherited: false }));
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- seeds the editable step list when the scope tab changes; steps are mutated afterward so cannot be pure-derived
-      setSteps(parentStepsCopy);
-      setSelectedStepId(parentStepsCopy[0]?.id || null);
-    } else {
-      const childStepsCopy = PARENT_STEPS_PRESET.map(s => ({ ...s, isInherited: true }));
-      setSteps(childStepsCopy);
-      setSelectedStepId(childStepsCopy[0]?.id || null);
-    }
+    clientFetch<UnitNode[]>('/api/v1/iam/units/tree/', { method: 'GET' })
+      .then(tree => { if (tree.length > 0) setOwningUnitId(tree[0].id); })
+      .catch(() => {});
+  }, []);
+
+  /* eslint-disable react-hooks/set-state-in-effect -- resetting derived state when scope changes */
+  useEffect(() => {
+    setSteps([]);
+    setSelectedStepId(null);
   }, [currentScope]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleDecoupleStep = (stepId: string) => {
     setSteps(prev => prev.map(step => {
@@ -61,7 +60,7 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
           id: `decoupled-${Date.now()}-${step.sequence}`,
           isInherited: false,
           title: `${step.title} (Custom)`,
-          unitName: `${institution.departments[1] || 'Departmental'}`
+          unitName: ''
         };
       }
       return step;
@@ -132,12 +131,12 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
     const newStep: WorkflowStep = {
       id: newId,
       sequence: nextSeq,
-      title: `Step ${nextSeq}: Additional Review`,
-      unitName: 'Registrar Directorate',
-      requirementType: 'OFFICER_SIGN_OFF',
-      details: 'Inspect outstanding administrative items manually.',
-      assignedOfficer: 'Dr. Joseph Alabi',
-      x: lastStep ? Math.min(lastStep.x + 280, 1100) : 100,
+      title: `Step ${nextSeq}: New Requirement`,
+      unitName: '',
+      requirementType: 'DOCUMENT_UPLOAD',
+      details: '',
+      assignedOfficer: '',
+      x: lastStep ? Math.min(lastStep.x + 280, 1100) : 80,
       y: lastStep ? lastStep.y : 180,
       isInherited: false
     };
@@ -158,7 +157,33 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
 
   return (
     <div className="space-y-6 w-full">
-      <CanvasHeader institution={institution} isSaving={isSaving} onForceAlign={forceAlignLinearChain} onSaveWorkflow={() => { setIsSaving(true); setTimeout(() => { setIsSaving(false); setSaveSuccess(true); setTimeout(() => setSaveSuccess(false), 3000); }, 1200); }} />
+      <CanvasHeader institution={institution} isSaving={isSaving} onForceAlign={forceAlignLinearChain} onSaveWorkflow={async () => {
+        setIsSaving(true);
+        setSaveError(null);
+        try {
+          const templateName = `${institution.shortName} Clearance – ${new Date().toISOString().split('T')[0]}`;
+          const template = await clientFetch<WorkflowTemplate>('/api/v1/workflows/templates/', {
+            method: 'POST',
+            body: { name: templateName, owning_unit: owningUnitId, is_active: true },
+          });
+
+          for (const step of steps.filter(s => !s.isInherited)) {
+            await clientFetch('/api/v1/workflows/requirements/', {
+              method: 'POST',
+              body: { template: template.id, name: step.title, requirement_type: step.requirementType },
+            });
+          }
+
+          setSaveSuccess(true);
+          setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err) {
+          const msg = err instanceof ClientApiError ? err.message : 'Failed to publish workflow.';
+          setSaveError(msg);
+          setTimeout(() => setSaveError(null), 5000);
+        } finally {
+          setIsSaving(false);
+        }
+      }} />
       <InheritanceBar institution={institution} currentScope={currentScope} setCurrentScope={setCurrentScope} />
 
       <AnimatePresence>
@@ -166,8 +191,16 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl flex items-start gap-3 text-left">
             <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-bold text-white">Clearance Process Structure Saved</h4>
-              <p className="text-xs text-emerald-300/70 mt-0.5">The sequence structure layout constraints has been successfully written to active memory data stores.</p>
+              <h4 className="text-sm font-bold text-white">Clearance Process Published</h4>
+              <p className="text-xs text-emerald-300/70 mt-0.5">The workflow template and requirements have been saved to the backend.</p>
+            </div>
+          </motion.div>
+        )}
+        {saveError && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl flex items-start gap-3 text-left">
+            <div>
+              <h4 className="text-sm font-bold text-rose-400">Publish Failed</h4>
+              <p className="text-xs text-rose-300/70 mt-0.5">{saveError}</p>
             </div>
           </motion.div>
         )}
@@ -197,32 +230,48 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
             <div className="absolute inset-y-0 left-0 min-w-337.5 w-full opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1.2px, transparent 1.2px)', backgroundSize: '24px 24px' }} />
             
             <div ref={canvasRef} className="relative h-120" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left', width: `${100 / canvasScale}%`, minWidth: '1350px' }}>
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-                <defs>
-                  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" opacity="0.4" /></marker>
-                  <marker id="arrow-selected" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" /></marker>
-                </defs>
-                {steps.map((s, idx) => {
-                  if (idx === steps.length - 1) return null;
-                  const next = steps[idx + 1];
-                  const x1 = s.x + 250; const y1 = s.y + 75;
-                  const x2 = next.x; const y2 = next.y + 75;
-                  const isSel = selectedStepId === s.id || selectedStepId === next.id;
-                  return (
-                    <g key={s.id}>
-                      {isSel && <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#10b981" strokeWidth="4" className="opacity-20 blur-[1px]" />}
-                      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={isSel ? '#34d399' : 'rgba(255,255,255,0.12)'} strokeWidth={isSel ? '2' : '1.5'} markerEnd={`url(#${isSel ? 'arrow-selected' : 'arrow'})`} />
-                    </g>
-                  );
-                })}
-              </svg>
+              {steps.length === 0 ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <div className="w-12 h-12 mx-auto rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Layout className="w-5 h-5 text-white/20" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white/40">No clearance steps defined</p>
+                      <p className="text-xs text-white/25 mt-1">Click &quot;Add clearance step&quot; to build your workflow</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                    <defs>
+                      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" opacity="0.4" /></marker>
+                      <marker id="arrow-selected" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" /></marker>
+                    </defs>
+                    {steps.map((s, idx) => {
+                      if (idx === steps.length - 1) return null;
+                      const next = steps[idx + 1];
+                      const x1 = s.x + 250; const y1 = s.y + 75;
+                      const x2 = next.x; const y2 = next.y + 75;
+                      const isSel = selectedStepId === s.id || selectedStepId === next.id;
+                      return (
+                        <g key={s.id}>
+                          {isSel && <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#10b981" strokeWidth="4" className="opacity-20 blur-[1px]" />}
+                          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={isSel ? '#34d399' : 'rgba(255,255,255,0.12)'} strokeWidth={isSel ? '2' : '1.5'} markerEnd={`url(#${isSel ? 'arrow-selected' : 'arrow'})`} />
+                        </g>
+                      );
+                    })}
+                  </svg>
 
-              {steps.map(s => (
-                <WorkflowNodeCard 
-                  key={s.id} step={s} isSelected={selectedStepId === s.id} isDragging={draggingStepId === s.id} currentScope={currentScope}
-                  meta={REQUIREMENT_META_MAP[s.requirementType]} onNodeDragStart={handleNodeDragStart} onDecoupleStep={handleDecoupleStep} onRemoveStep={removeStep}
-                />
-              ))}
+                  {steps.map(s => (
+                    <WorkflowNodeCard
+                      key={s.id} step={s} isSelected={selectedStepId === s.id} isDragging={draggingStepId === s.id} currentScope={currentScope}
+                      meta={REQUIREMENT_META_MAP[s.requirementType]} onNodeDragStart={handleNodeDragStart} onDecoupleStep={handleDecoupleStep} onRemoveStep={removeStep}
+                    />
+                  ))}
+                </>
+              )}
             </div>
 
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none text-[9px] font-mono">
