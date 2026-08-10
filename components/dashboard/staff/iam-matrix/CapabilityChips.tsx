@@ -13,7 +13,7 @@ export default function CapabilityChips({ permissions, capabilitiesMetadata }: C
   const [isOpen, setIsOpen] = useState(false);
   
   if (!permissions || permissions.length === 0) {
-    return <span className="text-[10px] text-white/20 italic font-medium font-sans">None configured</span>;
+    return <span className="text-[10px] text-subtle italic font-medium font-sans">None configured</span>;
   }
 
   const showMore = permissions.length > 3;
@@ -29,7 +29,7 @@ export default function CapabilityChips({ permissions, capabilitiesMetadata }: C
       {displayed.map((perm) => (
         <span 
           key={perm}
-          className="px-2.5 py-1 rounded bg-[#161616] text-amber-400 border border-amber-500/25 text-[9px] font-bold font-mono tracking-tight shadow-sm"
+          className="px-2.5 py-1 rounded bg-chip text-amber-400 border border-amber-500/25 text-[9px] font-bold font-mono tracking-tight shadow-sm"
         >
           {getLabel(perm)}
         </span>
@@ -54,17 +54,17 @@ export default function CapabilityChips({ permissions, capabilitiesMetadata }: C
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute z-50 top-full left-0 mt-1.5 p-3 bg-[#0d0d0d] border border-white/10 rounded-xl shadow-2xl flex flex-col gap-1.5 min-w-50"
+                className="absolute z-50 top-full left-0 mt-1.5 p-3 bg-surface-dropdown border border-edge rounded-xl shadow-2xl flex flex-col gap-1.5 min-w-50"
                 onMouseEnter={() => setIsOpen(true)}
                 onMouseLeave={() => setIsOpen(false)}
               >
-                <div className="text-[8px] uppercase tracking-widest font-bold text-white/40 mb-1 border-b border-white/5 pb-1 font-mono">
+                <div className="text-[8px] uppercase tracking-widest font-bold text-muted mb-1 border-b border-edge-subtle pb-1 font-mono">
                   Active Permissions
                 </div>
                 {permissions.map((perm) => (
                   <div key={perm} className="flex items-center gap-1.5 py-0.5 text-left">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                    <span className="text-[10px] font-bold text-white/80 font-sans">{getLabel(perm)}</span>
+                    <span className="text-[10px] font-bold text-secondary font-sans">{getLabel(perm)}</span>
                   </div>
                 ))}
               </motion.div>

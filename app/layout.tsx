@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ThemeProvider from "@/components/shared/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "ClearUs | Academic Clearance Network",
@@ -12,9 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-background text-[#E0E0E0] antialiased select-none custom-scrollbar">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-bg-dark text-body antialiased select-none custom-scrollbar">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

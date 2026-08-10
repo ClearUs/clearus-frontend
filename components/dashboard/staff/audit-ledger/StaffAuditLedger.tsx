@@ -59,13 +59,13 @@ export function StaffAuditLedger() {
   };
 
   return (
-    <div className="bg-[#080808] border border-white/10 rounded-3xl overflow-hidden shadow-2xl w-full flex flex-col relative z-10">
+    <div className="bg-surface-inset border border-edge rounded-3xl overflow-hidden shadow-2xl w-full flex flex-col relative z-10">
       
       {/* Upper Control Ribbon Pane Header */}
-      <div className="border-b border-white/10 bg-[#0c0c0c] px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="border-b border-edge bg-surface-dropdown px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="text-left">
-          <h2 className="text-lg font-serif italic text-white leading-tight">Asynchronous Audit & Activity Log Ledger</h2>
-          <p className="text-xs text-white/40 mt-1 max-w-xl leading-relaxed">
+          <h2 className="text-lg font-serif italic text-heading leading-tight">Asynchronous Audit & Activity Log Ledger</h2>
+          <p className="text-xs text-muted mt-1 max-w-xl leading-relaxed">
             Immutable, read-only system-level log records tracking all officer clearance determinations, workflow updates, and security authorizations.
           </p>
         </div>
@@ -73,7 +73,7 @@ export function StaffAuditLedger() {
           <button
             type="button"
             onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 600); }}
-            className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/80 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+            className="p-2.5 bg-chip hover:bg-chip-hover border border-edge rounded-xl text-secondary hover:text-heading transition-all cursor-pointer flex items-center justify-center"
             title="Refresh Ledger Logs"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -82,7 +82,7 @@ export function StaffAuditLedger() {
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
+            className="px-4 py-2 bg-chip hover:bg-chip-hover text-secondary hover:text-heading border border-edge rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4 text-emerald-400" />
             <span>Export CSV</span>
@@ -100,14 +100,14 @@ export function StaffAuditLedger() {
       <LedgerTable filteredLogs={filteredLogs} />
 
       {/* Footer Metrics Tray */}
-      <div className="bg-[#0b0b0b] border-t border-white/5 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-white/40 font-mono font-bold tracking-wide uppercase">
+      <div className="bg-surface-inset border-t border-edge-subtle px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-muted font-mono font-bold tracking-wide uppercase">
         <div className="flex items-center gap-2">
           <Activity className="w-3.5 h-3.5 text-emerald-400" />
           <span>Connection Trail: <strong className="text-emerald-400">SECURE CONSOLE ACTIVE</strong></span>
         </div>
         <div className="flex items-center gap-4">
-          <span>Active Streams: <strong className="text-white font-sans">{filteredLogs.length} Records</strong></span>
-          <span>Compliance Framework: <strong className="text-white">FUTO v2.6-SECURE</strong></span>
+          <span>Active Streams: <strong className="text-heading font-sans">{filteredLogs.length} Records</strong></span>
+          <span>Compliance Framework: <strong className="text-heading">FUTO v2.6-SECURE</strong></span>
         </div>
       </div>
 

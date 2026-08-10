@@ -21,7 +21,7 @@ interface RightPanelProps {
     setShowPassword: (value: boolean) => void;
 }
 
-export default function RightPanel({ 
+export default function RightPanel({
     code,
     studentDomain,
     institution,
@@ -38,7 +38,6 @@ export default function RightPanel({
     setShowPassword
 }: RightPanelProps) {
 
-    // Dynamic state compiler for real-time validation feedback loop
     const getEmailDomainState = () => {
         if (!email) return { state: 'empty', text: 'Enter official email' };
         const parts = email.split('@');
@@ -62,34 +61,32 @@ export default function RightPanel({
     const domainState = getEmailDomainState();
 
     return (
-        <div className="flex-1 bg-[#0a0a0a] p-8 flex flex-col justify-center">
+        <div className="flex-1 bg-surface-inset p-8 flex flex-col justify-center">
             <div className="max-w-sm w-full mx-auto space-y-6">
 
                 <div className="flex items-center gap-3">
                     <UniversityCrest code={code} />
                     <div>
-                        <h2 className="text-xl font-serif italic text-white leading-none">Sign In</h2>
-                        <p className="text-white/40 text-[11px] mt-1">Access the clearance registry with your university-issued identity.</p>
+                        <h2 className="text-xl font-serif italic text-heading leading-none">Sign In</h2>
+                        <p className="text-muted text-[11px] mt-1">Access the clearance registry with your university-issued identity.</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleFormSubmit} className="space-y-4">
-                    {/* Input layer: Email */}
                     <div className="space-y-1.5">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-white/40 font-mono">Email Address</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-muted font-mono">Email Address</label>
                         <div className="relative flex items-center">
-                            <Mail className="absolute left-3.5 w-4 h-4 text-white/20" />
+                            <Mail className="absolute left-3.5 w-4 h-4 text-subtle" />
                             <input
                                 type="text"
                                 value={email}
                                 onChange={(e) => { setEmail(e.target.value); setErrorMsg(''); }}
                                 placeholder={`student@student.${studentDomain}`}
-                                className="w-full pl-10 pr-4 py-2.5 bg-bg-dark border border-white/10 rounded-xl text-white placeholder-white/20 text-sm focus:outline-none focus:border-green-500/40 transition-colors font-medium"
+                                className="w-full pl-10 pr-4 py-2.5 bg-bg-dark border border-edge rounded-xl text-heading placeholder-subtle text-sm focus:outline-none focus:border-green-500/40 transition-colors font-medium"
                                 required
                             />
                         </div>
 
-                        {/* Live Domain Validation Badge Layout */}
                         <div className="mt-1.5 flex flex-wrap gap-1.5 items-center min-h-5">
                             {domainState.state === 'valid' ? (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full font-sans">
@@ -102,14 +99,14 @@ export default function RightPanel({
                                     ✗ Domain Unauthorized
                                 </span>
                             ) : (
-                                <div className="flex flex-wrap items-center gap-1 text-[10px] text-white/40 font-mono">
+                                <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted font-mono">
                                     <span>Allowed:</span>
                                     {institution.allowedDomains.map(d => (
                                         <button
                                           key={d}
                                           type="button"
                                           onClick={() => handleDomainPillClick(d)}
-                                          className="bg-white/5 hover:bg-white/10 text-white/80 border border-white/5 px-1.5 py-0.5 rounded text-[9px] transition-colors cursor-pointer"
+                                          className="bg-chip hover:bg-chip-hover text-secondary border border-edge-subtle px-1.5 py-0.5 rounded text-[9px] transition-colors cursor-pointer"
                                         >
                                           @{d}
                                         </button>
@@ -119,22 +116,21 @@ export default function RightPanel({
                         </div>
                     </div>
 
-                    {/* Input layer: Password */}
                     <div className="space-y-1.5">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-white/40 font-mono">Password</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-muted font-mono">Password</label>
                         <div className="relative flex items-center">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full pl-3.5 pr-10 py-2.5 bg-bg-dark border border-white/10 rounded-xl text-white placeholder-white/20 text-sm focus:outline-none focus:border-green-500/40 transition-colors font-mono tracking-widest"
+                                className="w-full pl-3.5 pr-10 py-2.5 bg-bg-dark border border-edge rounded-xl text-heading placeholder-subtle text-sm focus:outline-none focus:border-green-500/40 transition-colors font-mono tracking-widest"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3.5 text-white/30 hover:text-white transition-colors cursor-pointer"
+                                className="absolute right-3.5 text-faint hover:text-heading transition-colors cursor-pointer"
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
@@ -142,7 +138,7 @@ export default function RightPanel({
                     </div>
 
                     <div className="text-right">
-                        <span className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer font-medium font-sans">Forgot Password?</span>
+                        <span className="text-xs text-muted hover:text-heading transition-colors cursor-pointer font-medium font-sans">Forgot Password?</span>
                     </div>
 
                     {errorMsg && (

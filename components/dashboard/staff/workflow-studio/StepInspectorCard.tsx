@@ -21,7 +21,7 @@ export default function StepInspectorCard({
 }: StepInspectorCardProps) {
   if (!selectedStep) {
     return (
-      <div className="py-12 text-center text-white/30 flex flex-col items-center justify-center bg-[#0e0e0e] border border-white/10 rounded-2xl p-5 shadow-xl">
+      <div className="py-12 text-center text-faint flex flex-col items-center justify-center bg-surface-card border border-edge rounded-2xl p-5 shadow-xl">
         <Info className="w-8 h-8 text-white/10 mb-2" />
         <p className="text-xs font-serif italic">Select any clearance step card to inspect details.</p>
       </div>
@@ -31,11 +31,11 @@ export default function StepInspectorCard({
   const isInherited = selectedStep.isInherited && currentScope === 'child';
 
   return (
-    <div className="bg-[#0e0e0e] border border-white/10 rounded-2xl p-5 space-y-4 shadow-xl font-sans text-left">
-      <div className="border-b border-white/5 pb-3 flex items-center justify-between font-mono">
+    <div className="bg-surface-card border border-edge rounded-2xl p-5 space-y-4 shadow-xl font-sans text-left">
+      <div className="border-b border-edge-subtle pb-3 flex items-center justify-between font-mono">
         <div className="flex items-center gap-2">
           <Settings className="w-4 h-4 text-emerald-400" />
-          <h3 className="font-serif italic text-white text-sm tracking-normal">Clearance Step Inspector</h3>
+          <h3 className="font-serif italic text-heading text-sm tracking-normal">Clearance Step Inspector</h3>
         </div>
         <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/10 px-2 py-0.5 rounded-full">
           Step {selectedStep.sequence}
@@ -69,34 +69,34 @@ export default function StepInspectorCard({
 
       <div className="space-y-4">
         <div className="space-y-1">
-          <label className="text-[9px] uppercase tracking-wider text-white/45 block font-mono font-bold">Step Name / Descriptor</label>
+          <label className="text-[9px] uppercase tracking-wider text-muted block font-mono font-bold">Step Name / Descriptor</label>
           <input
             type="text"
             disabled={isInherited}
             value={selectedStep.title.includes(':') ? selectedStep.title.split(':').slice(1).join(':').trim() : selectedStep.title}
             onChange={(e) => onUpdateField('title', `Step ${selectedStep.sequence}: ${e.target.value}`)}
-            className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-green-400/40 disabled:opacity-40"
+            className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none focus:border-green-400/40 disabled:opacity-40"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[9px] uppercase tracking-wider text-white/45 block font-mono font-bold">Assigned Organizational Unit</label>
+          <label className="text-[9px] uppercase tracking-wider text-muted block font-mono font-bold">Assigned Organizational Unit</label>
           <input
             type="text"
             disabled={isInherited}
             value={selectedStep.unitName}
             onChange={(e) => onUpdateField('unitName', e.target.value)}
-            className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-green-400/40 disabled:opacity-40"
+            className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none focus:border-green-400/40 disabled:opacity-40"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[9px] uppercase tracking-wider text-white/45 block font-mono font-bold">Clearance Action Type</label>
+          <label className="text-[9px] uppercase tracking-wider text-muted block font-mono font-bold">Clearance Action Type</label>
           <select
             disabled={isInherited}
             value={selectedStep.requirementType}
             onChange={(e) => onUpdateField('requirementType', e.target.value)}
-            className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-green-400/40 disabled:opacity-40 cursor-pointer"
+            className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none focus:border-green-400/40 disabled:opacity-40 cursor-pointer"
           >
             <option value="DOCUMENT_UPLOAD">DOCUMENT UPLOAD (Digital Document Review)</option>
             <option value="FORM_UPLOAD">FORM UPLOAD (Department Handover Form)</option>
@@ -113,7 +113,7 @@ export default function StepInspectorCard({
               disabled={isInherited}
               value={selectedStep.feeAmount || ''}
               onChange={(e) => onUpdateField('feeAmount', Number(e.target.value))}
-              className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none"
+              className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none"
             />
           </div>
         )}
@@ -126,35 +126,35 @@ export default function StepInspectorCard({
               disabled={isInherited}
               value={selectedStep.requiredFileName || ''}
               onChange={(e) => onUpdateField('requiredFileName', e.target.value)}
-              className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none"
+              className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none"
             />
           </div>
         )}
 
         <div className="space-y-1">
-          <label className="text-[9px] uppercase tracking-wider text-white/45 block font-mono font-bold">Signing Officer (Assigned Agent)</label>
+          <label className="text-[9px] uppercase tracking-wider text-muted block font-mono font-bold">Signing Officer (Assigned Agent)</label>
           <input
             type="text"
             disabled={isInherited}
             value={selectedStep.assignedOfficer}
             onChange={(e) => onUpdateField('assignedOfficer', e.target.value)}
-            className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-green-400/40 disabled:opacity-40"
+            className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading focus:outline-none focus:border-green-400/40 disabled:opacity-40"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[9px] uppercase tracking-wider text-white/45 block font-mono font-bold">Clearance Directives</label>
+          <label className="text-[9px] uppercase tracking-wider text-muted block font-mono font-bold">Clearance Directives</label>
           <textarea
             disabled={isInherited}
             value={selectedStep.details}
             onChange={(e) => onUpdateField('details', e.target.value)}
             rows={3}
-            className="w-full bg-bg-dark border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-white placeholder-white/10 focus:outline-none focus:border-green-400/40 disabled:opacity-40 resize-none"
+            className="w-full bg-bg-dark border border-edge rounded-xl px-3 py-2 text-xs font-semibold text-heading placeholder-subtle focus:outline-none focus:border-green-400/40 disabled:opacity-40 resize-none"
           />
         </div>
 
         {!selectedStep.isInherited && (
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between font-mono text-[10px]">
+          <div className="pt-2 border-t border-edge-subtle flex items-center justify-between font-mono text-[10px]">
             <button
               type="button"
               onClick={() => onRemoveStep(selectedStep.id)}
@@ -163,7 +163,7 @@ export default function StepInspectorCard({
               <Trash2 className="w-3.5 h-3.5" />
               <span>Delete Step</span>
             </button>
-            <div className="text-white/30">ID: {selectedStep.id.split('-')[0]}</div>
+            <div className="text-faint">ID: {selectedStep.id.split('-')[0]}</div>
           </div>
         )}
       </div>

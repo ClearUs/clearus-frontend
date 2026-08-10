@@ -7,20 +7,19 @@ interface LeftPanelProps {
   motto: string;
   staffDomain: string;
   studentDomain: string;
-  bannerGradient: string; 
+  bannerGradient: string;
 }
 
 export default function LeftPanel({
-  code, 
-  name, 
-  motto, 
-  staffDomain, 
+  code,
+  name,
+  motto,
+  staffDomain,
   studentDomain,
   bannerGradient
 }: LeftPanelProps) {
   return (
     <div className={`w-full md:w-5/12 bg-linear-to-b ${bannerGradient} p-8 flex flex-col justify-between relative border-r border-white/5`}>
-      {/* Subtle overlay elements for structural depth */}
       <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-white/2 blur-2xl pointer-events-none" />
       <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-white/2 blur-2xl pointer-events-none" />
 

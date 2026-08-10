@@ -191,7 +191,7 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl flex items-start gap-3 text-left">
             <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-bold text-white">Clearance Process Published</h4>
+              <h4 className="text-sm font-bold text-heading">Clearance Process Published</h4>
               <p className="text-xs text-emerald-300/70 mt-0.5">The workflow template and requirements have been saved to the backend.</p>
             </div>
           </motion.div>
@@ -208,17 +208,17 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 flex flex-col space-y-4">
-          <div className="flex items-center justify-between bg-white/2 border border-white/5 rounded-xl p-3 px-4">
+          <div className="flex items-center justify-between bg-chip border border-edge-subtle rounded-xl p-3 px-4">
             <div className="flex items-center gap-2 font-mono text-xs">
               <Layout className="w-4 h-4 text-emerald-400" />
-              <span className="font-bold text-white/80">Clearance Process Map</span>
-              <span className="text-white/30 font-sans text-[10px]">({steps.length} Steps Active)</span>
+              <span className="font-bold text-secondary">Clearance Process Map</span>
+              <span className="text-faint font-sans text-[10px]">({steps.length} Steps Active)</span>
             </div>
             <div className="flex items-center gap-3 font-mono text-[10px]">
-              <div className="flex items-center bg-[#0e0e0e] border border-white/10 rounded-lg p-0.5">
-                <button type="button" onClick={() => setCanvasScale(p => Math.max(0.75, p - 0.1))} className="p-1 px-2.5 hover:text-white cursor-pointer">-</button>
-                <span className="text-white/40">{Math.round(canvasScale * 100)}%</span>
-                <button type="button" onClick={() => setCanvasScale(p => Math.min(1.2, p + 0.1))} className="p-1 px-2.5 hover:text-white cursor-pointer">+</button>
+              <div className="flex items-center bg-surface-card border border-edge rounded-lg p-0.5">
+                <button type="button" onClick={() => setCanvasScale(p => Math.max(0.75, p - 0.1))} className="p-1 px-2.5 hover:text-heading cursor-pointer">-</button>
+                <span className="text-muted">{Math.round(canvasScale * 100)}%</span>
+                <button type="button" onClick={() => setCanvasScale(p => Math.min(1.2, p + 0.1))} className="p-1 px-2.5 hover:text-heading cursor-pointer">+</button>
               </div>
               <button type="button" onClick={addNewStep} className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 py-1.5 px-3 rounded-lg border border-emerald-500/10 cursor-pointer font-sans font-bold text-xs">
                 <Plus className="w-3.5 h-3.5" /><span>Add clearance step</span>
@@ -226,19 +226,19 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
             </div>
           </div>
 
-          <div className="relative w-full bg-[#070707] border border-white/10 rounded-2xl overflow-auto custom-scrollbar h-120">
+          <div className="relative w-full bg-surface-card border border-edge rounded-2xl overflow-auto custom-scrollbar h-120">
             <div className="absolute inset-y-0 left-0 min-w-337.5 w-full opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1.2px, transparent 1.2px)', backgroundSize: '24px 24px' }} />
             
             <div ref={canvasRef} className="relative h-120" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left', width: `${100 / canvasScale}%`, minWidth: '1350px' }}>
               {steps.length === 0 ? (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                      <Layout className="w-5 h-5 text-white/20" />
+                    <div className="w-12 h-12 mx-auto rounded-xl bg-chip border border-edge flex items-center justify-center">
+                      <Layout className="w-5 h-5 text-subtle" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white/40">No clearance steps defined</p>
-                      <p className="text-xs text-white/25 mt-1">Click &quot;Add clearance step&quot; to build your workflow</p>
+                      <p className="text-sm font-bold text-muted">No clearance steps defined</p>
+                      <p className="text-xs text-subtle mt-1">Click &quot;Add clearance step&quot; to build your workflow</p>
                     </div>
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
             </div>
 
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none text-[9px] font-mono">
-              <div className="bg-black/90 border border-white/5 p-2 rounded-xl flex items-center gap-4 text-white/50 pointer-events-auto">
+              <div className="bg-black/90 border border-edge-subtle p-2 rounded-xl flex items-center gap-4 text-muted pointer-events-auto">
                 <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /><span>Selected Process</span></div>
                 <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-400" /><span>Inherited Lock</span></div>
               </div>
@@ -289,11 +289,11 @@ export default function WorkflowStudioCanvas({ institution }: WorkflowStudioCanv
             onUpdateField={(f, v) => setSteps(prev => prev.map(s => s.id === selectedStepId ? { ...s, [f]: v } : s))} onRemoveStep={removeStep}
           />
           
-          <div className="bg-[#0e0e0e]/50 border border-white/5 p-4 rounded-xl space-y-3 text-left">
-            <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest flex items-center gap-1.5 font-mono">
+          <div className="bg-surface-card/50 border border-edge-subtle p-4 rounded-xl space-y-3 text-left">
+            <h4 className="text-[10px] font-bold text-faint uppercase tracking-widest flex items-center gap-1.5 font-mono">
               <Sliders className="w-3.5 h-3.5" /><span>Workflow Designer Tips</span>
             </h4>
-            <div className="text-[10px] text-white/40 space-y-2 leading-relaxed font-sans">
+            <div className="text-[10px] text-muted space-y-2 leading-relaxed font-sans">
               <p><strong>Sequential Process Flow</strong>: Students complete clearance steps from left to right. Drag steps to reorganize the process timeline sequence.</p>
               <p><strong>Inherited Requirements</strong>: Steps marked as locked are configured centrally. Decouple the requirement lock to declare custom guidelines.</p>
             </div>

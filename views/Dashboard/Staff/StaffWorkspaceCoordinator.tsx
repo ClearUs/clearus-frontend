@@ -78,7 +78,7 @@ export default function StaffWorkspaceCoordinator({ institution, user }: StaffWo
           )}
 
           {activeSection !== 'clearance_queue' && activeSection !== 'verification_desk' && activeSection !== 'org_units' && activeSection !== 'workflow_studio' && activeSection !== 'iam_matrix' && activeSection !== 'audit_ledger' && (
-            <div className="h-96 border border-white/5 bg-[#0e0e0e] rounded-2xl flex items-center justify-center text-xs text-white/30 font-mono uppercase tracking-widest">
+            <div className="h-96 border border-edge-subtle bg-surface-card rounded-2xl flex items-center justify-center text-xs text-faint font-mono uppercase tracking-widest">
               Section: {activeSection.replace('_', ' ')} Canvas Under Construction
             </div>
           )}
