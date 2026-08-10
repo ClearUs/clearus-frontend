@@ -106,13 +106,15 @@ export default function OrgModalManager({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[9px] font-mono font-bold uppercase text-muted">Level Type</label>
-                  <select value={newNodeData.type || 'department'} onChange={e => setNewNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))} className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none cursor-pointer">
+                  <label className="text-[9px] font-mono font-bold uppercase text-muted">Unit Type</label>
+                  <input type="text" value={newNodeData.type || ''} onChange={e => setNewNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))}  placeholder="e.g. Department" className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none" />
+
+                  {/* <select value={newNodeData.type || 'department'} onChange={e => setNewNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))} className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none cursor-pointer">
                     <option value="faculty">Faculty</option>
                     <option value="division">Division</option>
                     <option value="department">Department</option>
                     <option value="desk">Office / Desk</option>
-                  </select>
+                  </select> */}
                 </div>
                 {/* <div className="space-y-1">
                   <label className="text-[9px] font-mono font-bold uppercase text-muted">Staff Count</label>
@@ -171,13 +173,15 @@ export default function OrgModalManager({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[9px] font-mono font-bold uppercase text-muted">Level Type</label>
-                  <select value={editNodeData.type || 'department'} onChange={e => setEditNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))} className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none cursor-pointer">
+                  <label className="text-[9px] font-mono font-bold uppercase text-muted">Unit Type</label>
+                  <input type="text" value={editNodeData.type || ''} onChange={e => setEditNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))}  placeholder="e.g. Department" className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none " />
+                  
+                  {/* <select value={editNodeData.type || 'department'} onChange={e => setEditNodeData(p => ({ ...p, type: e.target.value as OrgNode['type'] }))} className="w-full bg-bg-dark border border-edge rounded-xl px-2.5 py-2 text-xs text-secondary focus:outline-none cursor-pointer">
                     <option value="faculty">Faculty</option>
                     <option value="division">Division</option>
                     <option value="department">Department</option>
                     <option value="desk">Office / Desk</option>
-                  </select>
+                  </select> */}
                 </div>
                 {/* <div className="space-y-1">
                   <label className="text-[9px] font-mono font-bold uppercase text-muted">Staff Count</label>
