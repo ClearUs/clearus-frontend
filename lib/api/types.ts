@@ -1,5 +1,9 @@
-export interface TokenPair {
-  username: string;
+export interface LoginStep1Response {
+  message: string;
+  expires_in_seconds: number;
+}
+
+export interface LoginStep2Response {
   access: string;
   refresh: string;
 }
@@ -88,6 +92,12 @@ export interface ApproveStepPayload {
 
 export interface UpdatePasswordPayload {
   old_password: string;
+  new_password: string;
+}
+
+export interface PasswordResetConfirmPayload {
+  email: string;
+  code: string;
   new_password: string;
 }
 

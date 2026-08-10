@@ -5,7 +5,7 @@ export async function POST() {
   store.delete('cu_access');
   store.delete('cu_refresh');
   store.delete('cu_role');
-  store.delete('cu_username');
+  store.delete('cu_email');
   store.delete('cu_user_id');
 
   return Response.json({ logged_out: true });

@@ -6,14 +6,17 @@ import { Institution, User } from '@/types/index';
 import LeftPanel from '@/components/auth/BrandedLogin/LeftPanel';
 import RightPanel from '@/components/auth/BrandedLogin/RightPanel';
 import MfaPanel from '@/components/auth/BrandedLogin/MfaPanel';
+import ResetPasswordPanel from '@/components/auth/BrandedLogin/ResetPasswordPanel';
 
 interface BrandedLoginProps {
     institution: Institution;
 }
 
+type SubView = 'login' | 'two-factor' | 'reset-password';
+
 export default function BrandedLogin({ institution }: BrandedLoginProps) {
     const router = useRouter();
-    const [currentSubView, setCurrentSubView] = useState<'login' | 'two-factor'>('login');
+    const [currentSubView, setCurrentSubView] = useState<SubView>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -35,18 +38,16 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
         setErrorMsg('');
         setIsLoading(true);
 
-        const username = email.trim().split('@')[0];
-
         try {
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ email: email.trim(), password }),
             });
 
             if (!res.ok) {
                 const data = await res.json();
-                setErrorMsg('Invalid credentials. Please try again.');
+                setErrorMsg(data.detail || 'Invalid credentials. Please try again.');
                 setIsLoading(false);
                 return;
             }
@@ -60,6 +61,14 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleResendCode = async () => {
+        await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim(), password }),
+        });
     };
 
     const handleMfaAuthenticationSuccess = () => {
@@ -78,7 +87,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
                 studentDomain={studentDomain}
             />
 
-            {currentSubView === 'login' ? (
+            {currentSubView === 'login' && (
                 <RightPanel
                     code={institution.code}
                     studentDomain={studentDomain}
@@ -94,12 +103,25 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
                     setErrorMsg={setErrorMsg}
                     setPassword={setPassword}
                     setShowPassword={setShowPassword}
+                    onForgotPassword={() => setCurrentSubView('reset-password')}
                 />
-            ) : (
+            )}
+
+            {currentSubView === 'two-factor' && (
                 <MfaPanel
                     code={institution.code}
+                    email={email.trim()}
                     onBackToLogin={() => setCurrentSubView('login')}
                     onMfaSuccess={handleMfaAuthenticationSuccess}
+                    onResendCode={handleResendCode}
+                />
+            )}
+
+            {currentSubView === 'reset-password' && (
+                <ResetPasswordPanel
+                    code={institution.code}
+                    initialEmail={email.trim()}
+                    onBackToLogin={() => setCurrentSubView('login')}
                 />
             )}
         </div>
