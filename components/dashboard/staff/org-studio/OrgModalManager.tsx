@@ -60,7 +60,7 @@ export default function OrgModalManager({
       {/* MODAL 1: Confirm Drag & Drop Downstream Impact */}
       <AnimatePresence>
         {pendingMove && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-500 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <motion.div 
               initial={{ scale: 0.96, opacity: 0 }} 
               animate={{ scale: 1, opacity: 1 }} 
@@ -114,18 +114,18 @@ export default function OrgModalManager({
                     <option value="desk">Office / Desk</option>
                   </select>
                 </div>
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <label className="text-[9px] font-mono font-bold uppercase text-muted">Staff Count</label>
                   <input type="number" value={newNodeData.staffCount || 0} onChange={e => setNewNodeData(p => ({ ...p, staffCount: Number(e.target.value) }))} className="w-full bg-bg-dark border border-edge rounded-xl px-3.5 py-2 text-xs text-heading focus:outline-none" />
-                </div>
+                </div> */}
               </div>
-              {(newNodeData.type === 'faculty' || newNodeData.type === 'department') && (
+              {/* {(newNodeData.type === 'faculty' || newNodeData.type === 'department') && (
                 <div className="space-y-1">
                   <label className="text-[9px] font-mono font-bold uppercase text-muted">Student Count Capacity</label>
                   <input type="number" value={newNodeData.studentCount || 0} onChange={e => setNewNodeData(p => ({ ...p, studentCount: Number(e.target.value) }))} className="w-full bg-bg-dark border border-edge rounded-xl px-3.5 py-2 text-xs text-heading focus:outline-none" />
                 </div>
-              )}
-              <div className="space-y-1.5">
+              )} */}
+              {/* <div className="space-y-1.5">
                 <label className="text-[9px] font-mono font-bold uppercase text-muted">Add Email Restriction Domain</label>
                 <div className="flex gap-2">
                   <input type="text" value={domainInput} onChange={e => setDomainInput(e.target.value)} placeholder="e.g. *cs.unilag.edu.ng" className="flex-1 bg-bg-dark border border-edge rounded-xl px-3 py-1.5 text-xs text-heading focus:outline-none" />
@@ -141,7 +141,7 @@ export default function OrgModalManager({
                     Add
                   </button>
                 </div>
-              </div>
+              </div> */}
               <div className="flex justify-end gap-3 border-t border-edge-subtle pt-4 font-mono text-xs">
                 <button type="button" onClick={onCancelAdd} className="px-4 py-2 text-muted hover:text-heading cursor-pointer font-sans font-medium">Cancel</button>
                 <button type="button" onClick={onCreateUnit} className="px-5 py-2 bg-emerald-500 text-black font-black uppercase tracking-wider rounded-lg cursor-pointer font-sans">Save Unit</button>
@@ -179,10 +179,10 @@ export default function OrgModalManager({
                     <option value="desk">Office / Desk</option>
                   </select>
                 </div>
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <label className="text-[9px] font-mono font-bold uppercase text-muted">Staff Count</label>
                   <input type="number" value={editNodeData.staffCount || 0} onChange={e => setEditNodeData(p => ({ ...p, staffCount: Number(e.target.value) }))} className="w-full bg-bg-dark border border-edge rounded-xl px-3.5 py-2 text-xs text-heading focus:outline-none" />
-                </div>
+                </div> */}
               </div>
               <div className="flex justify-end gap-3 border-t border-edge-subtle pt-4 font-mono text-xs">
                 <button type="button" onClick={onCancelEdit} className="px-4 py-2 text-muted hover:text-heading cursor-pointer font-sans font-medium">Cancel</button>
