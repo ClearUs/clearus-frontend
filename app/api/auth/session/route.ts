@@ -4,7 +4,7 @@ import { verifyToken } from '@/lib/api/auth';
 export async function GET() {
   const store = await cookies();
   const access = store.get('cu_access')?.value;
-  const username = store.get('cu_username')?.value;
+  const email = store.get('cu_email')?.value;
 
   if (!access) {
     return Response.json({ authenticated: false }, { status: 401 });
@@ -12,7 +12,7 @@ export async function GET() {
 
   try {
     await verifyToken(access);
-    return Response.json({ authenticated: true, username });
+    return Response.json({ authenticated: true, email });
   } catch {
     return Response.json({ authenticated: false }, { status: 401 });
   }

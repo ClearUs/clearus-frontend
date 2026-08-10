@@ -19,6 +19,7 @@ interface RightPanelProps {
     setErrorMsg: (value: string) => void;
     setPassword: (value: string) => void;
     setShowPassword: (value: boolean) => void;
+    onForgotPassword: () => void;
 }
 
 export default function RightPanel({
@@ -35,7 +36,8 @@ export default function RightPanel({
     handleDomainPillClick,
     setErrorMsg,
     setPassword,
-    setShowPassword
+    setShowPassword,
+    onForgotPassword
 }: RightPanelProps) {
 
     const getEmailDomainState = () => {
@@ -138,7 +140,7 @@ export default function RightPanel({
                     </div>
 
                     <div className="text-right">
-                        <span className="text-xs text-muted hover:text-heading transition-colors cursor-pointer font-medium font-sans">Forgot Password?</span>
+                        <button type="button" onClick={onForgotPassword} className="text-xs text-muted hover:text-heading transition-colors cursor-pointer font-medium font-sans">Forgot Password?</button>
                     </div>
 
                     {errorMsg && (

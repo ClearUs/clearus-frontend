@@ -24,7 +24,7 @@ export async function getCurrentUser(schoolCode: string): Promise<User | null> {
   if (!role) return null;
 
   const store = await cookies();
-  const username = store.get('cu_username')?.value;
+  const email = store.get('cu_email')?.value;
   const userId = store.get('cu_user_id')?.value;
 
   const code = schoolCode.toUpperCase();
@@ -32,11 +32,13 @@ export async function getCurrentUser(schoolCode: string): Promise<User | null> {
   const fallbackDomain = institution?.allowedDomains[0] ?? 'university.edu.ng';
   const fallbackDept = institution?.departments[0] ?? 'General Studies';
 
+  const displayName = email ? email.split('@')[0] : undefined;
+
   if (role === 'student') {
     return {
       id: userId || `STUDENT/${code}/0000`,
-      name: username ?? 'Student',
-      email: username ? `${username}@${fallbackDomain}` : `student@${fallbackDomain}`,
+      name: displayName ?? 'Student',
+      email: email ?? `student@${fallbackDomain}`,
       role: 'student',
       schoolCode: code,
       matricNo: `${code}/CS/20/0000`,
@@ -46,8 +48,8 @@ export async function getCurrentUser(schoolCode: string): Promise<User | null> {
 
   return {
     id: userId ? `STAFF/${code}/${userId.slice(0, 8)}` : `STAFF/${code}/0000`,
-    name: username ?? 'Staff',
-    email: username ? `${username}@${fallbackDomain}` : `officer@${fallbackDomain}`,
+    name: displayName ?? 'Staff',
+    email: email ?? `officer@${fallbackDomain}`,
     role: 'staff',
     schoolCode: code,
     staffId: userId ? `STAFF/${code}/${userId.slice(0, 8)}` : `STAFF/${code}/0000`,

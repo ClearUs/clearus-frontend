@@ -1,5 +1,11 @@
 export { apiRequest, ApiResponseError } from './client';
-export { obtainToken, refreshToken, verifyToken } from './auth';
+export {
+  loginStep1,
+  loginVerify2fa,
+  refreshToken,
+  verifyToken,
+  resetPasswordConfirm,
+} from './auth';
 export { getUnitsTree, getUnitDetail, createUnit, updateUnit } from './units';
 export {
   createWorkflowTemplate,
