@@ -66,60 +66,60 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
     <div className="space-y-4 font-sans w-full relative">
       
       {/* Header Info Block */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0e0e0e] border border-white/5 p-6 rounded-2xl shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card border border-edge-subtle p-6 rounded-2xl shadow-xl">
         <div>
           <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider font-mono">
             CLEARANCE DESK
           </span>
-          <h2 className="text-xl font-serif italic text-white leading-tight mt-1.5">Clearance Request Data Queues</h2>
-          <p className="text-xs text-white/40 mt-1">
+          <h2 className="text-xl font-serif italic text-heading leading-tight mt-1.5">Clearance Request Data Queues</h2>
+          <p className="text-xs text-muted mt-1">
             High-density real-time workspace for administrative and verification staff to inspect, audit, and approve student clearance profiles.
           </p>
         </div>
-        <button className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold font-mono text-white rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors">
+        <button className="px-4 py-2.5 bg-chip hover:bg-chip-hover border border-edge text-xs font-bold font-mono text-heading rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors">
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Refresh Requests</span>
         </button>
       </div>
 
       {/* Horizontal Queue Tab Filters */}
-      <div className="flex flex-wrap items-center gap-2 bg-bg-dark border border-white/10 p-1.5 rounded-2xl w-fit font-mono text-xs">
-        <button onClick={() => setQueueTab('all')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'all' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
+      <div className="flex flex-wrap items-center gap-2 bg-bg-dark border border-edge p-1.5 rounded-2xl w-fit font-mono text-xs">
+        <button onClick={() => setQueueTab('all')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'all' ? 'bg-chip-hover text-heading' : 'text-muted'}`}>
           All Requests <span className="text-[10px] opacity-40 pl-0.5 font-sans">{requests.length}</span>
         </button>
-        <button onClick={() => setQueueTab('pending')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'pending' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
+        <button onClick={() => setQueueTab('pending')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'pending' ? 'bg-chip-hover text-heading' : 'text-muted'}`}>
           Pending My Review <span className="text-[10px] text-amber-500 font-bold pl-0.5 font-sans">{requests.filter(r => r.status === 'pending').length}</span>
         </button>
-        <button onClick={() => setQueueTab('urgent')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'urgent' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/10' : 'text-white/40'}`}>
+        <button onClick={() => setQueueTab('urgent')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'urgent' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/10' : 'text-muted'}`}>
           Urgent Escalations <span className="text-[10px] font-bold pl-0.5 font-sans">{requests.filter(r => r.type === 'urgent').length}</span>
         </button>
-        <button onClick={() => setQueueTab('actioned')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'actioned' ? 'bg-white/10 text-white' : 'text-white/40'}`}>
+        <button onClick={() => setQueueTab('actioned')} className={`px-4 py-2 rounded-xl font-bold transition-all ${queueTab === 'actioned' ? 'bg-chip-hover text-heading' : 'text-muted'}`}>
           Actioned <span className="text-[10px] opacity-40 pl-0.5 font-sans">{requests.filter(r => r.status === 'cleared' || r.status === 'flagged').length}</span>
         </button>
       </div>
 
       {/* Filters Search strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-[#0a0a0a] p-4 rounded-xl border border-white/5 text-xs text-white/70">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-surface-inset p-4 rounded-xl border border-edge-subtle text-xs text-secondary">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle" />
           <input 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search matric..."
-            className="w-full bg-bg-dark border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-white placeholder-white/20 focus:outline-none"
+            className="w-full bg-bg-dark border border-edge rounded-xl pl-9 pr-4 py-2.5 text-heading placeholder-subtle focus:outline-none"
           />
         </div>
-        <select className="bg-bg-dark border border-white/10 rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Filter by Faculty (All)</option></select>
-        <select className="bg-bg-dark border border-white/10 rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Filter by Type (All)</option></select>
-        <select className="bg-bg-dark border border-white/10 rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Sort: Longest In Queue</option></select>
+        <select className="bg-bg-dark border border-edge rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Filter by Faculty (All)</option></select>
+        <select className="bg-bg-dark border border-edge rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Filter by Type (All)</option></select>
+        <select className="bg-bg-dark border border-edge rounded-xl px-3 py-2.5 focus:outline-none cursor-pointer"><option>Sort: Longest In Queue</option></select>
       </div>
 
       {/* Request Data Matrix Container */}
-      <div className="bg-[#0e0e0e] rounded-2xl border border-white/10 shadow-2xl p-5 overflow-hidden">
+      <div className="bg-surface-card rounded-2xl border border-edge shadow-2xl p-5 overflow-hidden">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4 mb-4 min-h-13">
-          <h3 className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2 font-mono">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-edge-subtle pb-4 mb-4 min-h-13">
+          <h3 className="text-xs font-bold text-heading uppercase tracking-wide flex items-center gap-2 font-mono">
             <span>ACTIVE QUEUE STREAM</span>
             <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-sans tracking-normal font-medium normal-case">
               {requests.length} Requests
@@ -135,7 +135,7 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
                 className="flex flex-wrap items-center gap-3 bg-bg-dark border border-amber-500/20 px-4 py-1.5 rounded-xl shadow-xl font-mono text-[11px]"
               >
                 <span className="text-amber-400 font-black">{selectedIds.length} Selected</span>
-                <div className="h-4 w-1 bg-white/10" />
+                <div className="h-4 w-1 bg-chip-hover" />
 
                 {bulkApprovalLocked ? (
                   <div className="flex items-center gap-1.5 text-[10px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md font-bold font-sans">
@@ -149,7 +149,7 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
                   </div>
                 )}
 
-                <div className="h-4 w-1 bg-white/10" />
+                <div className="h-4 w-1 bg-chip-hover" />
 
                 <button
                   type="button"
@@ -157,7 +157,7 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
                   onClick={handleBulkApprove}
                   className={`px-3 py-1 rounded-md text-[10px] font-black transition-all ${
                     bulkApprovalLocked 
-                      ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5' 
+                      ? 'bg-chip text-subtle cursor-not-allowed border border-edge-subtle' 
                       : 'bg-green-500 hover:bg-green-400 text-black cursor-pointer shadow-sm'
                   }`}
                 >
@@ -175,7 +175,7 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
                 <button
                   type="button"
                   onClick={() => setSelectedIds([])}
-                  className="text-white/40 hover:text-white transition-colors text-[10px]"
+                  className="text-muted hover:text-heading transition-colors text-[10px]"
                 >
                   Clear
                 </button>
@@ -187,13 +187,13 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
         <div className="overflow-x-auto w-full no-scrollbar">
           <table className="w-full text-left border-collapse min-w-175">
             <thead>
-              <tr className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-2">
+              <tr className="text-[10px] font-mono font-bold uppercase tracking-wider text-faint border-b border-edge-subtle pb-2">
                 <th className="py-2 pl-2 w-12">
                   <input 
                     type="checkbox" 
                     checked={isAllSelected}
                     onChange={handleSelectAllToggle}
-                    className="rounded bg-black border-white/10 focus:ring-0 cursor-pointer w-3.5 h-3.5 checked:bg-green-500 checked:border-green-500 text-green-500" 
+                    className="rounded bg-black border-edge focus:ring-0 cursor-pointer w-3.5 h-3.5 checked:bg-green-500 checked:border-green-500 text-green-500" 
                   />
                 </th>
                 <th className="py-2">Student Profile</th>
@@ -203,13 +203,13 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
                 <th className="py-2 text-right pr-4">Action</th>
               </tr>
             </thead>
-            <tbody className="text-xs font-sans divide-y divide-white/5">
+            <tbody className="text-xs font-sans divide-y divide-edge-subtle">
               {requests.length === 0 && (
                 <tr>
                   <td colSpan={6} className="py-16 text-center">
                     <div className="space-y-2">
-                      <p className="text-sm font-bold text-white/30">No clearance requests</p>
-                      <p className="text-xs text-white/20">Requests will appear here when students submit clearance steps.</p>
+                      <p className="text-sm font-bold text-faint">No clearance requests</p>
+                      <p className="text-xs text-subtle">Requests will appear here when students submit clearance steps.</p>
                     </div>
                   </td>
                 </tr>
@@ -217,30 +217,30 @@ export default function RequestQueueTable({ queueTab, setQueueTab }: QueueTableP
               {requests.map((req) => {
                 const isSelected = selectedIds.includes(req.id);
                 return (
-                  <tr key={req.id} className={`transition-colors group ${isSelected ? 'bg-white/2' : 'hover:bg-white/1'}`}>
+                  <tr key={req.id} className={`transition-colors group ${isSelected ? 'bg-chip' : 'hover:bg-chip'}`}>
                     <td className="py-4 pl-2">
                       <input 
                         type="checkbox" 
                         checked={isSelected}
                         onChange={() => handleRowCheckboxToggle(req.id)}
-                        className="rounded bg-black border-white/10 focus:ring-0 cursor-pointer w-3.5 h-3.5 checked:bg-green-500 checked:border-green-500 text-green-500" 
+                        className="rounded bg-black border-edge focus:ring-0 cursor-pointer w-3.5 h-3.5 checked:bg-green-500 checked:border-green-500 text-green-500" 
                       />
                     </td>
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-mono font-bold text-white shadow-sm">
+                        <div className="w-8 h-8 rounded-full bg-chip border border-edge flex items-center justify-center text-[10px] font-mono font-bold text-heading shadow-sm">
                           {req.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
-                          <span className="font-bold text-white block leading-tight">{req.name}</span>
-                          <span className="text-[10px] font-mono text-white/40 mt-0.5 block">{req.matric} • {req.dept}</span>
+                          <span className="font-bold text-heading block leading-tight">{req.name}</span>
+                          <span className="text-[10px] font-mono text-muted mt-0.5 block">{req.matric} • {req.dept}</span>
                         </div>
                       </div>
                     </td>
                     <td className="py-4">
                       <div>
-                        <span className="font-bold text-white block">{req.title}</span>
-                        <span className="text-[9px] font-mono text-white/30 mt-0.5 block">ID: {req.id}</span>
+                        <span className="font-bold text-heading block">{req.title}</span>
+                        <span className="text-[9px] font-mono text-faint mt-0.5 block">ID: {req.id}</span>
                       </div>
                     </td>
                     <td className="py-4">

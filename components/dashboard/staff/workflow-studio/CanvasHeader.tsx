@@ -13,13 +13,13 @@ interface CanvasHeaderProps {
 
 export default function CanvasHeader({ institution, isSaving, onForceAlign, onSaveWorkflow }: CanvasHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/5 pb-5">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-edge-subtle pb-5">
       <div className="text-left">
         <span className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold font-mono">
           Clearance Workflow Designer
         </span>
-        <h2 className="text-xl font-serif italic text-white mt-1">Clearance Process Canvas</h2>
-        <p className="text-xs text-white/40 mt-0.5">
+        <h2 className="text-xl font-serif italic text-heading mt-1">Clearance Process Canvas</h2>
+        <p className="text-xs text-muted mt-0.5">
           Model, inherit, and publish strictly linear, non-branching clearance sequences for {institution.name}.
         </p>
       </div>
@@ -28,7 +28,7 @@ export default function CanvasHeader({ institution, isSaving, onForceAlign, onSa
         <button
           type="button"
           onClick={onForceAlign}
-          className="flex items-center gap-1.5 bg-[#0e0e0e] hover:bg-neutral-800 border border-white/10 text-white/80 py-2 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          className="flex items-center gap-1.5 bg-surface-card hover:bg-neutral-800 border border-edge text-secondary py-2 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
           title="Auto-align steps in a perfect straight horizontal sequence"
         >
           <GitCommit className="w-3.5 h-3.5 text-emerald-400" />

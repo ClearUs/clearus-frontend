@@ -39,21 +39,19 @@ export default function RedirectionSplash({ institution, onRedirectComplete }: R
         >
             <div className="max-w-md w-full text-center space-y-6">
 
-                {/* Radar Spinner Visualizer */}
                 <RadarSpinner institutionCode={institution.code} />
 
                 <div>
-                    <h2 className="text-xl md:text-2xl font-serif italic mb-2 text-white">
+                    <h2 className="text-xl md:text-2xl font-serif italic mb-2 text-heading">
                         Connecting to University Gateway
                     </h2>
-                    <div className="inline-flex items-center justify-center gap-2 bg-[#0a0a0a] border border-white/10 px-4 py-2 rounded-xl font-mono text-xs">
-                        <span className="text-white/40">clearus.com</span>
+                    <div className="inline-flex items-center justify-center gap-2 bg-surface-inset border border-edge px-4 py-2 rounded-xl font-mono text-xs">
+                        <span className="text-muted">clearus.com</span>
                         <ArrowRight className="w-3.5 h-3.5 text-green-400" />
                         <span className="text-green-400 font-bold">{institution.shortName.toLowerCase()}.clearus.com/login</span>
                     </div>
                 </div>
 
-                {/* Step Progression Card */}
                 <StepProgressionCard step={step} />
             </div>
         </motion.div>

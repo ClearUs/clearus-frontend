@@ -57,7 +57,7 @@ export default function OrgTreePanel({
       <div key={node.id} className="relative select-none w-full">
         {depth > 0 && (
           <div 
-            className="absolute -left-4 top-0 bottom-1/2 w-4 border-l border-b border-white/10 rounded-bl"
+            className="absolute -left-4 top-0 bottom-1/2 w-4 border-l border-b border-edge rounded-bl"
             style={{ left: `${(depth - 1) * 20 + 10}px` }}
           />
         )}
@@ -72,10 +72,10 @@ export default function OrgTreePanel({
           style={{ paddingLeft: `${depth * 20 + 8}px` }}
           className={`group flex items-center justify-between p-2.5 rounded-xl transition-all duration-200 cursor-pointer border ${
             isSelected 
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-white' 
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-heading' 
               : isDragOver
               ? 'bg-green-500/20 border-green-400 border-dashed text-green-300'
-              : 'border-transparent hover:bg-white/5 text-[#B0B0B0] hover:text-white'
+              : 'border-transparent hover:bg-chip text-[#B0B0B0] hover:text-heading'
           }`}
         >
           <div className="flex items-center gap-2 truncate min-w-0">
@@ -83,7 +83,7 @@ export default function OrgTreePanel({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleExpand(node.id); }}
-                className="p-0.5 rounded hover:bg-white/10 text-white/50 hover:text-white cursor-pointer"
+                className="p-0.5 rounded hover:bg-chip-hover text-muted hover:text-heading cursor-pointer"
               >
                 {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
               </button>
@@ -98,7 +98,7 @@ export default function OrgTreePanel({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onOpenAddModal(node.id); }}
-              className="p-1 rounded bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 text-white/50 transition-colors cursor-pointer"
+              className="p-1 rounded bg-chip hover:bg-emerald-500/20 hover:text-emerald-400 text-muted transition-colors cursor-pointer"
               title="Add Nested Child Unit"
             >
               <Plus className="w-3 h-3" />
@@ -106,7 +106,7 @@ export default function OrgTreePanel({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onOpenEditModal(node); }}
-              className="p-1 rounded bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-white/50 transition-colors cursor-pointer"
+              className="p-1 rounded bg-chip hover:bg-amber-500/20 hover:text-amber-400 text-muted transition-colors cursor-pointer"
               title="Modify Unit"
             >
               <Edit2 className="w-3 h-3" />
@@ -114,7 +114,7 @@ export default function OrgTreePanel({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onDeleteUnit(node.id); }}
-              className="p-1 rounded bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-white/50 transition-colors cursor-pointer"
+              className="p-1 rounded bg-chip hover:bg-rose-500/20 hover:text-rose-400 text-muted transition-colors cursor-pointer"
               title="Delete Unit"
             >
               <Trash2 className="w-3 h-3" />
@@ -134,9 +134,9 @@ export default function OrgTreePanel({
   const rootNodes = nodes.filter(n => n.parentId === null);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-linear-to-b from-[#080808] to-[#030303]">
-      <div className="px-5 py-3 border-b border-white/5 bg-white/2 flex items-center justify-between text-xs">
-        <span className="text-[10px] font-mono uppercase font-bold text-white/40 tracking-wider">
+    <div className="flex flex-col h-full overflow-hidden bg-surface-page">
+      <div className="px-5 py-3 border-b border-edge-subtle bg-chip flex items-center justify-between text-xs">
+        <span className="text-[10px] font-mono uppercase font-bold text-muted tracking-wider">
           {institution.shortName} Hierarchy Directory
         </span>
         <div className="text-[9px] text-emerald-400 bg-emerald-500/5 px-2.5 py-0.5 rounded border border-emerald-500/10 font-mono flex items-center gap-1">
@@ -150,7 +150,7 @@ export default function OrgTreePanel({
         onDrop={(e) => handleDrop(e, null)}
       >
         {rootNodes.length === 0 ? (
-          <div className="text-center py-16 text-white/30 text-xs font-serif italic">
+          <div className="text-center py-16 text-faint text-xs font-serif italic">
             No organizational hierarchy blocks defined. Use &apos;Add Unit&apos; to initialize directory logs.
           </div>
         ) : (

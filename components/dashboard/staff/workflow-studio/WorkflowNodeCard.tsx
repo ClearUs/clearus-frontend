@@ -33,20 +33,20 @@ export default function WorkflowNodeCard({
       className={`absolute w-62.5 rounded-xl border p-4 select-none z-10 transition-all ${
         isSelected 
           ? isInherited
-            ? 'border-amber-400/80 bg-[#120d05] shadow-xl ring-1 ring-amber-500/20'
-            : 'border-emerald-400 bg-neutral-900 shadow-xl shadow-emerald-500/5 ring-1 ring-emerald-500/20' 
-          : isInherited 
-            ? 'border-amber-500/10 bg-[#0d0904] hover:border-amber-500/20'
-            : 'border-white/10 bg-[#0c0c0c] hover:border-white/20'
+            ? 'border-amber-400/80 bg-amber-500/10 shadow-xl ring-1 ring-amber-500/20'
+            : 'border-emerald-400 bg-surface-card shadow-xl shadow-emerald-500/5 ring-1 ring-emerald-500/20'
+          : isInherited
+            ? 'border-amber-500/10 bg-amber-500/5 hover:border-amber-500/20'
+            : 'border-edge bg-surface-dropdown hover:border-edge'
       } ${isDragging ? 'cursor-grabbing scale-102 opacity-90' : 'cursor-grab'}`}
       onMouseDown={(e) => onNodeDragStart(e, step.id)}
     >
-      <div className="flex items-center justify-between pb-2 border-b border-white/5 mb-2.5 drag-handle font-mono text-[10px]">
+      <div className="flex items-center justify-between pb-2 border-b border-edge-subtle mb-2.5 drag-handle font-mono text-[10px]">
         <div className="flex items-center gap-1.5">
           <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded ${
             isSelected 
               ? isInherited ? 'bg-amber-400 text-slate-950' : 'bg-emerald-400 text-slate-950' 
-              : isInherited ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/80'
+              : isInherited ? 'bg-amber-500/20 text-amber-300' : 'bg-chip-hover text-secondary'
           }`}>
             ID: ST-0{step.sequence}
           </span>
@@ -73,7 +73,7 @@ export default function WorkflowNodeCard({
             <button
               type="button"
               onClick={() => onRemoveStep(step.id)}
-              className="text-white/30 hover:text-rose-400 transition-colors p-0.5 cursor-pointer"
+              className="text-faint hover:text-rose-400 transition-colors p-0.5 cursor-pointer"
               title="Delete this custom step"
             >
               <Trash2 className="w-3 h-3" />
@@ -83,13 +83,13 @@ export default function WorkflowNodeCard({
       </div>
 
       <div className="space-y-2 text-left font-sans">
-        <h4 className="text-xs font-serif italic font-bold text-white leading-tight">
+        <h4 className="text-xs font-serif italic font-bold text-heading leading-tight">
           {step.title.includes(':') ? step.title.split(':').slice(1).join(':').trim() : step.title}
         </h4>
         
-        <div className="text-[9.5px] text-white/50 leading-tight">
-          <span className="text-white/30 font-mono text-[8px] uppercase tracking-wide mr-1">Assigned Unit:</span>
-          <span className="font-semibold text-white/70">{step.unitName}</span>
+        <div className="text-[9.5px] text-muted leading-tight">
+          <span className="text-faint font-mono text-[8px] uppercase tracking-wide mr-1">Assigned Unit:</span>
+          <span className="font-semibold text-secondary">{step.unitName}</span>
         </div>
 
         <div className="flex items-center justify-between pt-1.5">
@@ -97,16 +97,16 @@ export default function WorkflowNodeCard({
             {meta.icon}
             <span>{meta.badge}</span>
           </div>
-          <span className="text-[8px] text-white/30 font-mono">Assigned: {step.assignedOfficer.split(' ')[0]}</span>
+          <span className="text-[8px] text-faint font-mono">Assigned: {step.assignedOfficer.split(' ')[0]}</span>
         </div>
 
-        <p className="text-[9px] text-white/35 line-clamp-2 leading-relaxed border-t border-white/3 pt-1.5 mt-1.5">
+        <p className="text-[9px] text-faint line-clamp-2 leading-relaxed border-t border-edge-subtle pt-1.5 mt-1.5">
           {step.details}
         </p>
       </div>
 
-      <div className="absolute top-17.75 -left-1 w-2.5 h-2.5 rounded-full border border-white/20 bg-neutral-950 z-20" />
-      <div className="absolute top-17.75 -right-1.5 w-2.5 h-2.5 rounded-full border border-emerald-500/55 bg-neutral-950 z-20" />
+      <div className="absolute top-17.75 -left-1 w-2.5 h-2.5 rounded-full border border-edge bg-bg-dark z-20" />
+      <div className="absolute top-17.75 -right-1.5 w-2.5 h-2.5 rounded-full border border-emerald-500/55 bg-bg-dark z-20" />
     </div>
   );
 }

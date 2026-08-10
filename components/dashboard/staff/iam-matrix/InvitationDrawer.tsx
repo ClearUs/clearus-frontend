@@ -58,14 +58,14 @@ export default function InvitationDrawer({
                     <motion.div
                         initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-                        className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#090909] border-l border-white/10 shadow-2xl p-6 flex flex-col h-full overflow-y-auto custom-scrollbar"
+                        className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-surface-sidebar border-l border-edge shadow-2xl p-6 flex flex-col h-full overflow-y-auto custom-scrollbar"
                     >
-                        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                        <div className="flex items-center justify-between pb-4 border-b border-edge mb-6">
                             <div className="flex items-center gap-2">
                                 <Shield className="w-5 h-5 text-amber-400" />
-                                <h4 className="italic text-white text-base font-bold uppercase tracking-wider font-sans ">Create Staff Member</h4>
+                                <h4 className="italic text-heading text-base font-bold uppercase tracking-wider font-sans ">Create Staff Member</h4>
                             </div>
-                            <button type="button" onClick={onClose} className="text-white/40 hover:text-white p-1.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"><X className="w-4 h-4" /></button>
+                            <button type="button" onClick={onClose} className="text-muted hover:text-heading p-1.5 rounded-lg hover:bg-chip cursor-pointer transition-colors"><X className="w-4 h-4" /></button>
                         </div>
 
                         <form onSubmit={onSubmit} className="flex-1 flex flex-col justify-between space-y-6">
@@ -79,24 +79,24 @@ export default function InvitationDrawer({
                                     <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-mono block">System Identity</span>
                                     <div className="grid grid-cols-2 gap-3.5">
                                         <div>
-                                            <label className="block text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1.5 font-mono">First Name</label>
-                                            <input type="text" required value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First Name" className="w-full bg-bg-dark border border-white/10 text-white text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-white/20 font-sans" />
+                                            <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5 font-mono">First Name</label>
+                                            <input type="text" required value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First Name" className="w-full bg-bg-dark border border-edge text-heading text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-subtle font-sans" />
                                         </div>
                                         <div>
-                                            <label className="block text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1.5 font-mono">Last Name</label>
-                                            <input type="text" required value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last Name" className="w-full bg-bg-dark border border-white/10 text-white text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-white/20 font-sans" />
+                                            <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5 font-mono">Last Name</label>
+                                            <input type="text" required value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last Name" className="w-full bg-bg-dark border border-edge text-heading text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-subtle font-sans" />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                                         <div>
-                                            <label className="block text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1.5 font-mono">Employee ID</label>
-                                            <input type="text" required value={newStaffId} onChange={e => setNewStaffId(e.target.value)} placeholder={`e.g. EMP/${institution.code}/101`} className="w-full bg-bg-dark border border-white/10 text-white text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-white/20 font-mono uppercase" />
+                                            <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5 font-mono">Employee ID</label>
+                                            <input type="text" required value={newStaffId} onChange={e => setNewStaffId(e.target.value)} placeholder={`e.g. EMP/${institution.code}/101`} className="w-full bg-bg-dark border border-edge text-heading text-xs font-medium rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-subtle font-mono uppercase" />
                                         </div>
                                         <div>
-                                            <label className="block text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1.5 font-mono">Institutional Email</label>
+                                            <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5 font-mono">Institutional Email</label>
                                             <div className="relative flex items-center">
-                                                <input type="text" required value={emailPrefix} onChange={e => setEmailPrefix(e.target.value)} placeholder="username" className="w-full bg-bg-dark border border-white/10 text-white text-xs font-medium rounded-xl pl-3.5 pr-28 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-white/20 font-mono" />
-                                                <span className="absolute right-3 text-[10px] font-bold text-white/40 pointer-events-none font-mono">@{institution.code.toLowerCase()}.edu.ng</span>
+                                                <input type="text" required value={emailPrefix} onChange={e => setEmailPrefix(e.target.value)} placeholder="username" className="w-full bg-bg-dark border border-edge text-heading text-xs font-medium rounded-xl pl-3.5 pr-28 py-2.5 focus:outline-none focus:border-amber-500/50 placeholder-subtle font-mono" />
+                                                <span className="absolute right-3 text-[10px] font-bold text-muted pointer-events-none font-mono">@{institution.code.toLowerCase()}.edu.ng</span>
                                             </div>
                                         </div>
                                     </div>
@@ -106,30 +106,30 @@ export default function InvitationDrawer({
                                 <div className="space-y-3">
                                     <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-mono block">Department Binding</span>
                                     <div className="relative">
-                                        <button type="button" onClick={() => setIsTreeOpen(!isTreeOpen)} className="w-full bg-bg-dark border border-white/10 hover:border-white/20 text-white text-xs font-semibold rounded-xl px-3.5 py-2.5 flex items-center justify-between font-sans text-left cursor-pointer">
+                                        <button type="button" onClick={() => setIsTreeOpen(!isTreeOpen)} className="w-full bg-bg-dark border border-edge hover:border-edge text-heading text-xs font-semibold rounded-xl px-3.5 py-2.5 flex items-center justify-between font-sans text-left cursor-pointer">
                                             <span className="flex items-center gap-2"><Building className="w-4 h-4 text-amber-500" /><span>{newCell}</span></span>
-                                            <span className="text-white/40 text-[10px] font-mono">{isTreeOpen ? '▲' : '▼'}</span>
+                                            <span className="text-muted text-[10px] font-mono">{isTreeOpen ? '▲' : '▼'}</span>
                                         </button>
                                         {isTreeOpen && (
-                                            <div className="absolute z-50 left-0 right-0 mt-2 bg-[#0d0d0d] border border-white/10 rounded-xl shadow-2xl p-3 max-h-56 overflow-y-auto space-y-2 custom-scrollbar font-mono text-[11px]">
-                                                <div className="text-[8px] font-bold text-white/30 uppercase tracking-widest pb-1 border-b border-white/5">Select Organizational Unit</div>
-                                                <button type="button" onClick={() => { setExpandedNodes(expandedNodes.includes('academic') ? expandedNodes.filter(n => n !== 'academic') : [...expandedNodes, 'academic']); }} className="flex items-center gap-1.5 w-full text-left py-1 text-[9px] text-white/60 font-bold uppercase">
+                                            <div className="absolute z-50 left-0 right-0 mt-2 bg-surface-dropdown border border-edge rounded-xl shadow-2xl p-3 max-h-56 overflow-y-auto space-y-2 custom-scrollbar font-mono text-[11px]">
+                                                <div className="text-[8px] font-bold text-faint uppercase tracking-widest pb-1 border-b border-edge-subtle">Select Organizational Unit</div>
+                                                <button type="button" onClick={() => { setExpandedNodes(expandedNodes.includes('academic') ? expandedNodes.filter(n => n !== 'academic') : [...expandedNodes, 'academic']); }} className="flex items-center gap-1.5 w-full text-left py-1 text-[9px] text-secondary font-bold uppercase">
                                                     <span>{expandedNodes.includes('academic') ? '▼' : '▶'}</span>📂 Academic Units
                                                 </button>
                                                 {expandedNodes.includes('academic') && (
-                                                    <div className="pl-3 border-l border-white/5 ml-1.5 flex flex-col">
+                                                    <div className="pl-3 border-l border-edge-subtle ml-1.5 flex flex-col">
                                                         {institution.departments.map(d => (
-                                                            <button type="button" key={d} onClick={() => { setNewCell(d); setIsTreeOpen(false); }} className={`text-left py-1 px-2 rounded font-sans text-xs ${newCell === d ? 'text-amber-400 bg-white/5 font-bold' : 'text-white/70 hover:text-white'}`}>🎓 {d}</button>
+                                                            <button type="button" key={d} onClick={() => { setNewCell(d); setIsTreeOpen(false); }} className={`text-left py-1 px-2 rounded font-sans text-xs ${newCell === d ? 'text-amber-400 bg-chip font-bold' : 'text-secondary hover:text-heading'}`}>🎓 {d}</button>
                                                         ))}
                                                     </div>
                                                 )}
-                                                <button type="button" onClick={() => { setExpandedNodes(expandedNodes.includes('admin') ? expandedNodes.filter(n => n !== 'admin') : [...expandedNodes, 'admin']); }} className="flex items-center gap-1.5 w-full text-left py-1 text-[9px] text-white/60 font-bold uppercase">
+                                                <button type="button" onClick={() => { setExpandedNodes(expandedNodes.includes('admin') ? expandedNodes.filter(n => n !== 'admin') : [...expandedNodes, 'admin']); }} className="flex items-center gap-1.5 w-full text-left py-1 text-[9px] text-secondary font-bold uppercase">
                                                     <span>{expandedNodes.includes('admin') ? '▼' : '▶'}</span>📂 Support Divisions
                                                 </button>
                                                 {expandedNodes.includes('admin') && (
-                                                    <div className="pl-3 border-l border-white/5 ml-1.5 flex flex-col">
+                                                    <div className="pl-3 border-l border-edge-subtle ml-1.5 flex flex-col">
                                                         {['Bursary Division', 'Student Affairs Division', 'Library Services', 'Sports & Recreation'].map(d => (
-                                                            <button type="button" key={d} onClick={() => { setNewCell(d); setIsTreeOpen(false); }} className={`text-left py-1 px-2 rounded font-sans text-xs ${newCell === d ? 'text-amber-400 bg-white/5 font-bold' : 'text-white/70 hover:text-white'}`}>🏛️ {d}</button>
+                                                            <button type="button" key={d} onClick={() => { setNewCell(d); setIsTreeOpen(false); }} className={`text-left py-1 px-2 rounded font-sans text-xs ${newCell === d ? 'text-amber-400 bg-chip font-bold' : 'text-secondary hover:text-heading'}`}>🏛️ {d}</button>
                                                         ))}
                                                     </div>
                                                 )}
@@ -139,15 +139,15 @@ export default function InvitationDrawer({
                                 </div>
 
                                 {/* Multi modules checks options loops */}
-                                <div className="space-y-4 pt-2 border-t border-white/5">
+                                <div className="space-y-4 pt-2 border-t border-edge-subtle">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-mono">Explicit Privilege Assignment</span>
-                                        <button type="button" onClick={onSelectAllInheritable} className="text-[10px] font-bold text-white/60 hover:text-white font-sans cursor-pointer">Inherit All Capabilities</button>
+                                        <button type="button" onClick={onSelectAllInheritable} className="text-[10px] font-bold text-secondary hover:text-heading font-sans cursor-pointer">Inherit All Capabilities</button>
                                     </div>
 
                                     {['WORKFLOW', 'VAULT_CLEARANCE', 'UNIT_CELL_ADMIN'].map(modKey => (
                                         <div key={modKey} className="space-y-2">
-                                            <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest border-b border-white/5 pb-1 font-mono">
+                                            <div className="text-[9px] font-bold text-faint uppercase tracking-widest border-b border-edge-subtle pb-1 font-mono">
                                                 {modKey.replace('_', ' ')} Operations Controls
                                             </div>
                                             <div className="grid grid-cols-1 gap-2.5">
@@ -157,11 +157,11 @@ export default function InvitationDrawer({
                                                     return (
                                                         <div key={cap.key} className="flex items-start gap-2.5 font-sans">
                                                             <div className="relative flex items-center mt-0.5">
-                                                                <input type="checkbox" checked={isChecked} disabled={!isInheritable} onChange={() => onPermissionToggle(cap.key)} className="rounded border-white/30 text-amber-500 focus:ring-0 bg-neutral-900 w-3.5 h-3.5 cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed" />
+                                                                <input type="checkbox" checked={isChecked} disabled={!isInheritable} onChange={() => onPermissionToggle(cap.key)} className="rounded border-edge text-amber-500 focus:ring-0 bg-neutral-900 w-3.5 h-3.5 cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed" />
                                                             </div>
                                                             <div className="leading-tight">
-                                                                <span className={`text-xs font-bold block ${isInheritable ? isChecked ? 'text-amber-400' : 'text-white/80' : 'text-white/20 line-through'}`}>{cap.label}</span>
-                                                                <span className="text-[10px] text-white/40 block mt-0.5">{cap.description}</span>
+                                                                <span className={`text-xs font-bold block ${isInheritable ? isChecked ? 'text-amber-400' : 'text-secondary' : 'text-subtle line-through'}`}>{cap.label}</span>
+                                                                <span className="text-[10px] text-muted block mt-0.5">{cap.description}</span>
                                                             </div>
                                                         </div>
                                                     );
@@ -172,8 +172,8 @@ export default function InvitationDrawer({
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t border-white/10 mt-auto flex items-center justify-between font-sans text-xs">
-                                <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-white/60 hover:text-white bg-white/5 transition-colors cursor-pointer font-bold">Cancel</button>
+                            <div className="pt-6 border-t border-edge mt-auto flex items-center justify-between font-sans text-xs">
+                                <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-secondary hover:text-heading bg-chip transition-colors cursor-pointer font-bold">Cancel</button>
                                 <button type="submit" className="px-6 py-2.5 bg-emerald-500 text-slate-950 font-black tracking-wider uppercase rounded-xl transition-all shadow-md cursor-pointer">Secure Issue Invitation</button>
                             </div>
                         </form>

@@ -37,20 +37,20 @@ export default function LiveToast({ liveToast, onClose }: LiveToastProps) {
             LIVE
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-xs font-bold text-white font-mono flex items-center gap-1.5">
+            <p className="text-xs font-bold text-heading font-mono flex items-center gap-1.5">
               <span>🔔 Real-Time Update</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </p>
-            <p className="text-[11px] text-white/90 mt-1 font-semibold truncate">
+            <p className="text-[11px] text-secondary mt-1 font-semibold truncate">
               {liveToast.studentName}
             </p>
-            <p className="text-[10px] text-white/50 mt-0.5 leading-relaxed font-sans">
+            <p className="text-[10px] text-muted mt-0.5 leading-relaxed font-sans">
               {liveToast.message}
             </p>
           </div>
           <button 
             onClick={onClose}
-            className="text-white/30 hover:text-white text-xs font-bold px-1 transition-colors cursor-pointer"
+            className="text-faint hover:text-heading text-xs font-bold px-1 transition-colors cursor-pointer"
           >
             ×
           </button>

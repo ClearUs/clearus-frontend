@@ -46,7 +46,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
 
             if (!res.ok) {
                 const data = await res.json();
-                setErrorMsg(data.detail || 'Invalid credentials. Please try again.');
+                setErrorMsg('Invalid credentials. Please try again.');
                 setIsLoading(false);
                 return;
             }
@@ -67,7 +67,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     };
 
     return (
-        <div className="w-full flex flex-col md:flex-row min-h-145 border border-white/5 rounded-2xl overflow-hidden bg-[#070707] shadow-2xl relative">
+        <div className="w-full flex flex-col md:flex-row min-h-145 border border-edge rounded-2xl overflow-hidden bg-surface-card shadow-[var(--shadow-card)] relative">
 
             <LeftPanel
                 code={institution.code}

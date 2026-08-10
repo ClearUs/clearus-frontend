@@ -14,14 +14,12 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
     const [dbValidatedSchool, setDbValidatedSchool] = useState<{ code: string; name: string } | null>(null);
     const [dbValidationError, setDbValidationError] = useState<string | null>(null);
 
-    // Load recently accessed universities from local storage on mount
     useEffect(() => {
         try {
             const existing = localStorage.getItem('clearus_recent_schools');
             if (existing) {
                 setRecentCodes(JSON.parse(existing));
             } else {
-                // Fallback default list so the grid has beautiful content on initial load
                 const defaultList = ['FUTO', 'UNILAG'];
                 localStorage.setItem('clearus_recent_schools', JSON.stringify(defaultList));
                 setRecentCodes(defaultList);
@@ -31,7 +29,6 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
         }
     }, [setRecentCodes]);
 
-    // Real-time Database active validation check on typing
     useEffect(() => {
         const trimmed = searchQuery.trim();
         if (trimmed.length === 0) {
@@ -70,14 +67,13 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
         school.code.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Simulated Asynchronous registry typeahead lookup
     useEffect(() => {
         if (searchQuery.trim().length > 0) {
             // eslint-disable-next-line react-hooks/set-state-in-effect -- drives the debounced typeahead spinner; reset via the timer below
             setIsSearching(true);
             const timer = setTimeout(() => {
                 setIsSearching(false);
-            }, 250); // Mimic rapid DNS lookup
+            }, 250);
             return () => clearTimeout(timer);
         } else {
             setIsSearching(false);
@@ -139,9 +135,8 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
                         </button>
                     </form>
 
-                    {/* Asynchronous Typeahead Search-Select Dropdown */}
                     {searchQuery.trim().length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c0c0c] border border-white/15 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto divide-y divide-white/5 scrollbar-thin scrollbar-thumb-white/10">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-surface-dropdown border border-edge rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto divide-y divide-edge-subtle scrollbar-thin scrollbar-thumb-white/10">
                             {isSearching ? (
                                 <ActiveSearching />
                             ) : filteredSchools.length > 0 ? (
@@ -149,7 +144,7 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
                                     <FoundInstitutes key={inst.code} handleSelectWithRecent={handleSelectWithRecent} setSearchQuery={setSearchQuery} inst={inst} />
                                 ))
                             ) : (
-                                <div className="p-6 text-center text-xs text-white/30 font-mono">
+                                <div className="p-6 text-center text-xs text-faint font-mono">
                                     No registry match for &quot;{searchQuery.toUpperCase()}&quot;
                                 </div>
                             )}
@@ -158,7 +153,6 @@ export default function SearchGateway({ setRecentCodes, handleSelectWithRecent }
                 </div>
             </motion.div>
 
-            {/* Real-time DB active validation status check */}
             {
                 (() => {
                     if (isValidatingCode) {

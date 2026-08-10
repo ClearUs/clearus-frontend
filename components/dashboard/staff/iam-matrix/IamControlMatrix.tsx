@@ -80,7 +80,7 @@ export default function IamControlMatrix({ institution, user }: IamControlMatrix
 
   const cellOptions = Array.from(new Set([...institution.departments, 'Bursary Division', 'Student Affairs Division', 'Library Services', 'Sports & Recreation', ...staffList.map(s => s.assignedCell)])).sort();
 
-  const handleCreateStaff = (e: React.FormEvent) => {
+  const handleCreateStaff = (e: React.SubmitEvent) => {
     e.preventDefault();
     setFormError('');
 
@@ -123,13 +123,13 @@ export default function IamControlMatrix({ institution, user }: IamControlMatrix
 
   return (
     <div className="space-y-6 w-full relative">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#0a0a0a] border border-white/10 p-5 rounded-2xl shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-surface-inset border border-edge p-5 rounded-2xl shrink-0">
         <div className="text-left">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20"><Shield className="w-4 h-4 text-amber-400" /></div>
-            <h3 className="font-serif italic text-lg text-white">Identity & Access Management</h3>
+            <h3 className="font-serif italic text-lg text-heading">Identity & Access Management</h3>
           </div>
-          <p className="text-[11px] text-white/40 mt-1">Specify fine-grained operational privileges, department bindings, and active clearance authority tokens.</p>
+          <p className="text-[11px] text-muted mt-1">Specify fine-grained operational privileges, department bindings, and active clearance authority tokens.</p>
         </div>
         <button type="button" onClick={() => { setFormError(''); setShowCreateForm(true); }} className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors shrink-0 self-start sm:self-auto"><UserPlus className="w-4 h-4 text-slate-950 stroke-[2.5]" /><span>Create Staff Member</span></button>
       </div>

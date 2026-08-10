@@ -15,20 +15,18 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [isShaking, setIsShaking] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [countdown, setCountdown] = useState(119); // 01:59 standard countdown
+    const [countdown, setCountdown] = useState(119);
     const [useBackupCodes, setUseBackupCodes] = useState(false);
     const [backupInput, setBackupCodeInput] = useState('');
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    // Countdown clock timer loop
     useEffect(() => {
         if (countdown <= 0) return;
         const timer = setInterval(() => setCountdown(prev => prev - 1), 1000);
         return () => clearInterval(timer);
     }, [countdown]);
 
-    // Focus anchor loop on view mount
     useEffect(() => {
         if (!useBackupCodes) {
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
@@ -42,7 +40,6 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
     };
 
     const triggerVerification = (codeString: string) => {
-        // Prototype token match hook: "123456"
         if (codeString === '123456') {
             setErrorMsg('');
             onMfaSuccess();
@@ -112,7 +109,7 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
     };
 
     return (
-        <div className="flex-1 bg-[#0a0a0a] p-8 flex flex-col justify-center">
+        <div className="flex-1 bg-surface-inset p-8 flex flex-col justify-center">
             <motion.div
                 animate={isShaking ? { x: [-6, 6, -4, 4, -2, 2, 0] } : { x: 0 }}
                 transition={{ duration: 0.4 }}
@@ -121,23 +118,22 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
                 <div className="flex items-center gap-3">
                     <UniversityCrest code={code} />
                     <div>
-                        <h2 className="text-2xl font-serif italic text-white tracking-tight">Two-Factor Authentication</h2>
-                        <p className="text-white/45 text-xs mt-1">
+                        <h2 className="text-2xl font-serif italic text-heading tracking-tight">Two-Factor Authentication</h2>
+                        <p className="text-muted text-xs mt-1">
                             {useBackupCodes ? "Verify session access using physical university recovery backsheets." : "Verify your session identity using the code generated for your profile."}
                         </p>
                     </div>
                 </div>
 
                 {!useBackupCodes ? (
-                    /* Digit Inputs Interface container */
                     <div className="space-y-6">
-                        <div className="bg-white/2 border border-white/5 p-4 rounded-xl text-xs space-y-1">
+                        <div className="bg-chip border border-edge-subtle p-4 rounded-xl text-xs space-y-1">
                             <div className="font-bold text-amber-400 font-mono flex items-center gap-1">
                                 <Lock className="w-3.5 h-3.5" />
                                 <span>MFA SECURED SESSION</span>
                             </div>
-                            <p className="text-white/70">
-                                Enter the 6-digit numeric token that has been generated. For demo purposes, you can use <strong className="text-white bg-white/10 px-1.5 py-0.5 rounded font-mono">123456</strong>.
+                            <p className="text-secondary">
+                                Enter the 6-digit numeric token that has been generated. For demo purposes, you can use <strong className="text-heading bg-chip-hover px-1.5 py-0.5 rounded font-mono">123456</strong>.
                             </p>
                         </div>
 
@@ -161,7 +157,7 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
 
                         <div className="flex items-center justify-between text-xs font-mono">
                             {countdown > 0 ? (
-                                <span className="text-white/40">
+                                <span className="text-muted">
                                     {formatCountdown(countdown)}
                                 </span>
                             ) : (
@@ -183,7 +179,7 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
                             </div>
                         )}
 
-                        <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="pt-4 border-t border-edge-subtle flex flex-col sm:flex-row items-center justify-between gap-3">
                             <button
                                 type="button"
                                 onClick={() => { setUseBackupCodes(true); setErrorMsg(''); }}
@@ -194,28 +190,27 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
                             <button
                                 type="button"
                                 onClick={onBackToLogin}
-                                className="text-xs text-white/45 hover:text-white transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+                                className="text-xs text-muted hover:text-heading transition-colors flex items-center gap-1 font-semibold cursor-pointer"
                             >
                                 <ArrowLeft className="w-3.5 h-3.5" /> Return to Sign In
                             </button>
                         </div>
                     </div>
                 ) : (
-                    /* Emergency Fallback Override Panel form loop */
                     <form onSubmit={handleBackupSubmit} className="space-y-4">
                         <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl text-xs space-y-1">
                             <span className="font-bold text-amber-400 font-mono block">EMERGENCY BYPASS SHEET</span>
-                            <p className="text-white/70">Use simulation sequence <strong className="text-white font-mono bg-white/10 px-1.5 py-0.5 rounded">BACKUP123</strong>.</p>
+                            <p className="text-secondary">Use simulation sequence <strong className="text-heading font-mono bg-chip-hover px-1.5 py-0.5 rounded">BACKUP123</strong>.</p>
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-white/40 font-mono">Recovery Code</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted font-mono">Recovery Code</label>
                             <input
                                 type="text"
                                 value={backupInput}
                                 onChange={e => setBackupCodeInput(e.target.value)}
                                 placeholder="BACKUP123"
-                                className="w-full px-4 py-2.5 bg-bg-dark border border-white/10 rounded-xl text-white font-mono tracking-widest uppercase focus:outline-none focus:border-green-500/40"
+                                className="w-full px-4 py-2.5 bg-bg-dark border border-edge rounded-xl text-heading font-mono tracking-widest uppercase focus:outline-none focus:border-green-500/40"
                                 required
                             />
                         </div>
@@ -236,7 +231,7 @@ export default function MfaPanel({ code, onBackToLogin, onMfaSuccess }: MfaPanel
                         <button
                             type="button"
                             onClick={() => { setUseBackupCodes(false); setErrorMsg(''); }}
-                            className="w-full text-center text-xs text-white/40 hover:text-white transition-colors mt-2 block"
+                            className="w-full text-center text-xs text-muted hover:text-heading transition-colors mt-2 block"
                         >
                             Back to numeric OTP grid
                         </button>

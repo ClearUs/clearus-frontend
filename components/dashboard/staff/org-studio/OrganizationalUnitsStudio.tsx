@@ -223,8 +223,8 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
 
   if (isLoading) {
     return (
-      <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 h-162.5 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-white/40 text-sm">
+      <div className="w-full bg-bg-dark text-body rounded-2xl border border-edge h-162.5 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-muted text-sm">
           <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
           <span>Loading organizational units...</span>
         </div>
@@ -234,10 +234,10 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
 
   if (error) {
     return (
-      <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 h-162.5 flex items-center justify-center">
+      <div className="w-full bg-bg-dark text-body rounded-2xl border border-edge h-162.5 flex items-center justify-center">
         <div className="text-center space-y-3">
           <p className="text-rose-400 text-sm">{error}</p>
-          <button onClick={fetchUnits} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white rounded-xl cursor-pointer">
+          <button onClick={fetchUnits} className="px-4 py-2 bg-chip hover:bg-chip-hover border border-edge text-xs text-heading rounded-xl cursor-pointer">
             Retry
           </button>
         </div>
@@ -246,8 +246,8 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
   }
 
   return (
-    <div className="w-full bg-bg-dark text-[#E0E0E0] rounded-2xl border border-white/10 overflow-hidden flex flex-col h-162.5 shadow-2xl relative z-10">
-      <div className="bg-[#0c0c0c] px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0">
+    <div className="w-full bg-bg-dark text-body rounded-2xl border border-edge overflow-hidden flex flex-col h-162.5 shadow-2xl relative z-10">
+      <div className="bg-surface-dropdown px-6 py-4 border-b border-edge flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
             <Building className="w-4 h-4" />
@@ -256,7 +256,7 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
             <h2 className="text-xs font-black uppercase tracking-widest text-emerald-400 font-mono">
               Organizational Units Studio
             </h2>
-            <p className="text-[10px] text-white/40 font-mono mt-0.5">
+            <p className="text-[10px] text-muted font-mono mt-0.5">
               Configure hierarchical departments, office clearance desks, and workflow mappings.
             </p>
           </div>
@@ -276,7 +276,7 @@ export default function OrganizationalUnitsStudio({ institution }: Organizationa
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-        <div className="lg:col-span-7 border-r border-white/10 h-full overflow-hidden">
+        <div className="lg:col-span-7 border-r border-edge h-full overflow-hidden">
           <OrgTreePanel
             institution={institution} nodes={nodes} selectedNodeId={selectedNodeId} setSelectedNodeId={setSelectedNodeId}
             expandedNodes={expandedNodes} toggleExpand={id => setExpandedNodes(p => ({ ...p, [id]: !p[id] }))}
