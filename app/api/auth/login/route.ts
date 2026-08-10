@@ -2,7 +2,19 @@ import { loginStep1 } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  let email: string;
+  let password: string;
+
+  try {
+    const body = await request.json();
+    email = body.email;
+    password = body.password;
+  } catch {
+    return Response.json(
+      { detail: 'Invalid request body.' },
+      { status: 400 },
+    );
+  }
 
   if (!email || !password) {
     return Response.json(

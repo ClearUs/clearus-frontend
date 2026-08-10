@@ -2,7 +2,21 @@ import { resetPasswordConfirm } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
 
 export async function POST(request: Request) {
-  const { email, code, new_password } = await request.json();
+  let email: string;
+  let code: string;
+  let new_password: string;
+
+  try {
+    const body = await request.json();
+    email = body.email;
+    code = body.code;
+    new_password = body.new_password;
+  } catch {
+    return Response.json(
+      { detail: 'Invalid request body.' },
+      { status: 400 },
+    );
+  }
 
   if (!email || !code || !new_password) {
     return Response.json(

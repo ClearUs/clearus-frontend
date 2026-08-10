@@ -13,7 +13,19 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 }
 
 export async function POST(request: Request) {
-  const { email, code } = await request.json();
+  let email: string;
+  let code: string;
+
+  try {
+    const body = await request.json();
+    email = body.email;
+    code = body.code;
+  } catch {
+    return Response.json(
+      { detail: 'Invalid request body.' },
+      { status: 400 },
+    );
+  }
 
   if (!email || !code) {
     return Response.json(
