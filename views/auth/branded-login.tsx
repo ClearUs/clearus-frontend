@@ -69,7 +69,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
         await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim(), password, tenant }),
+            body: JSON.stringify({ email: email.trim(), password }),
         });
     };
 

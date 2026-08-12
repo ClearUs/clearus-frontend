@@ -48,7 +48,7 @@ export default function MfaPanel({ code, email, tenant, onBackToLogin, onMfaSucc
             const res = await fetch('/api/auth/verify-2fa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, code: codeString, tenant }),
+                body: JSON.stringify({ email, code: codeString }),
             });
 
             if (!res.ok) {
