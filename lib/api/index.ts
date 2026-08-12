@@ -1,4 +1,4 @@
-export { apiRequest, ApiResponseError } from './client';
+export { apiRequest, getBackendUrl, ApiResponseError } from './client';
 export {
   loginStep1,
   loginVerify2fa,

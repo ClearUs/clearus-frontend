@@ -54,11 +54,14 @@ export default function LandingPage() {
     };
 
     const handleRedirectComplete = () => {
-
         if (!selectedSchool) return;
 
-        router.push(`/auth/${selectedSchool.code}`);
-
+        const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN;
+        if (appDomain) {
+            window.location.href = `https://${selectedSchool.code.toLowerCase()}.${appDomain}/auth`;
+        } else {
+            router.push(`/auth/${selectedSchool.code}`);
+        }
     };
 
     return (

@@ -8,12 +8,13 @@ import UniversityCrest from '@/components/landing/UniversityCrest';
 interface MfaPanelProps {
     code: string;
     email: string;
+    tenant: string;
     onBackToLogin: () => void;
     onMfaSuccess: () => void;
     onResendCode: () => Promise<void>;
 }
 
-export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onResendCode }: MfaPanelProps) {
+export default function MfaPanel({ code, email, tenant, onBackToLogin, onMfaSuccess, onResendCode }: MfaPanelProps) {
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [isShaking, setIsShaking] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
@@ -47,7 +48,7 @@ export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onR
             const res = await fetch('/api/auth/verify-2fa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, code: codeString }),
+                body: JSON.stringify({ email, code: codeString, tenant }),
             });
 
             if (!res.ok) {

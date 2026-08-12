@@ -7,6 +7,7 @@ export async function POST() {
   store.delete('cu_role');
   store.delete('cu_email');
   store.delete('cu_user_id');
+  store.delete('cu_tenant');
 
   return Response.json({ logged_out: true });
 }

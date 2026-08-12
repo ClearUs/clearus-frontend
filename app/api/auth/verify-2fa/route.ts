@@ -15,11 +15,13 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 export async function POST(request: Request) {
   let email: string;
   let code: string;
+  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     code = body.code;
+    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -35,15 +37,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const data = await loginVerify2fa(email, code);
+    const data = await loginVerify2fa(email, code, tenant);
     const claims = decodeJwtPayload(data.access);
     const userId = typeof claims.user_id === 'string' ? claims.user_id : '';
 
     const store = await cookies();
+    const isProduction = process.env.NODE_ENV === 'production';
+    const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN; // e.g. "clearus.tech"
+
     const cookieBase = {
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'lax' as const,
       path: '/',
+      ...(isProduction && appDomain ? { domain: `.${appDomain}` } : {}),
     };
 
     store.set('cu_access', data.access, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 });
@@ -51,6 +57,9 @@ export async function POST(request: Request) {
     store.set('cu_role', 'staff', { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     store.set('cu_email', email, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     store.set('cu_user_id', userId, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+    if (tenant) {
+      store.set('cu_tenant', tenant, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+    }
 
     return Response.json({ user_id: userId });
   } catch (err) {

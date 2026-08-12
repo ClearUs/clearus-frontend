@@ -4,11 +4,13 @@ import { ApiResponseError } from '@/lib/api/client';
 export async function POST(request: Request) {
   let email: string;
   let password: string;
+  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     password = body.password;
+    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -24,7 +26,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const data = await loginStep1(email, password);
+    const data = await loginStep1(email, password, tenant);
     return Response.json(data);
   } catch (err) {
     if (err instanceof ApiResponseError) {

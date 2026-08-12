@@ -5,12 +5,14 @@ export async function POST(request: Request) {
   let email: string;
   let code: string;
   let new_password: string;
+  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     code = body.code;
     new_password = body.new_password;
+    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await resetPasswordConfirm({ email, code, new_password });
+    await resetPasswordConfirm({ email, code, new_password }, tenant);
     return Response.json({ success: true });
   } catch (err) {
     if (err instanceof ApiResponseError) {
