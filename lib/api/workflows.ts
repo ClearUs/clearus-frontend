@@ -16,7 +16,7 @@ export async function createWorkflowTemplate(
     method: 'POST',
     body: payload,
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -29,7 +29,7 @@ export async function createRequirement(
     method: 'POST',
     body: payload,
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -43,7 +43,7 @@ export async function linkRequirementDependency(
     method: 'POST',
     body: { prerequisite_id: prerequisiteId },
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -57,6 +57,6 @@ export async function approveStep(
     method: 'PATCH',
     body: payload,
     token,
-    tenant,
+    // tenant,
   });
 }
