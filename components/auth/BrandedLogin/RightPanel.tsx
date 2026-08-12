@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion';
 import UniversityCrest from '@/components/landing/UniversityCrest';
-import { Eye, EyeOff, Mail, ShieldAlert, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, ShieldAlert } from 'lucide-react';
 import { Institution } from '@/types';
 
 interface RightPanelProps {
@@ -41,23 +41,15 @@ export default function RightPanel({
 }: RightPanelProps) {
 
     const getEmailDomainState = () => {
-        if (!email) return { state: 'empty', text: 'Enter official email' };
+        if (!email) return { state: 'empty' };
         const parts = email.split('@');
-        if (parts.length < 2) {
-            return { state: 'typing_local', text: 'Waiting for @ domain...' };
-        }
+        if (parts.length < 2) return { state: 'typing_local' };
         const domain = parts[1].toLowerCase();
-        if (!domain) {
-            return { state: 'typing_domain', text: 'Choose or type domain' };
-        }
+        if (!domain) return { state: 'typing_domain' };
         if (institution.allowedDomains.includes(domain)) {
-            return { state: 'valid', text: 'Verified Institutional Domain', domain };
+            return { state: 'valid', domain };
         }
-        const hasPartialMatch = institution.allowedDomains.some(d => d.startsWith(domain));
-        if (hasPartialMatch) {
-            return { state: 'partial', text: 'Matching...' };
-        }
-        return { state: 'invalid', text: 'Domain unauthorized for this portal' };
+        return { state: 'other' };
     };
 
     const domainState = getEmailDomainState();
@@ -95,14 +87,9 @@ export default function RightPanel({
                                     <span className="w-1 h-1 rounded-full bg-green-400 animate-ping" />
                                     ✓ Approved Domain: {domainState.domain}
                                 </span>
-                            ) : domainState.state === 'invalid' ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full font-sans">
-                                    <AlertCircle className="w-3 h-3 text-rose-400" />
-                                    ✗ Domain Unauthorized
-                                </span>
                             ) : (
                                 <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted font-mono">
-                                    <span>Allowed:</span>
+                                    <span>Quick fill:</span>
                                     {institution.allowedDomains.map(d => (
                                         <button
                                           key={d}

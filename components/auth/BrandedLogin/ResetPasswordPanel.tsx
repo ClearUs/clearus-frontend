@@ -8,12 +8,13 @@ import UniversityCrest from '@/components/landing/UniversityCrest';
 interface ResetPasswordPanelProps {
     code: string;
     initialEmail: string;
+    tenant: string;
     onBackToLogin: () => void;
 }
 
 type ResetStep = 'enter-email' | 'verify-and-reset' | 'success';
 
-export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }: ResetPasswordPanelProps) {
+export default function ResetPasswordPanel({ code, initialEmail, tenant, onBackToLogin }: ResetPasswordPanelProps) {
     const [step, setStep] = useState<ResetStep>(initialEmail ? 'verify-and-reset' : 'enter-email');
     const [email, setEmail] = useState(initialEmail);
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
@@ -89,7 +90,7 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
             const res = await fetch('/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim(), code: codeString, new_password: newPassword }),
+                body: JSON.stringify({ email: email.trim(), code: codeString, new_password: newPassword, tenant }),
             });
 
             if (!res.ok) {

@@ -1,15 +1,16 @@
 import { cookies } from 'next/headers';
 import { type NextRequest } from 'next/server';
-
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://clearus-backend.onrender.com';
+import { getBackendUrl } from '@/lib/api/client';
 
 async function proxy(req: NextRequest) {
   const store = await cookies();
   const token = store.get('cu_access')?.value;
+  const tenant = store.get('cu_tenant')?.value;
+  const backend = getBackendUrl(tenant);
 
   let path = req.nextUrl.pathname.replace('/api/proxy', '');
   if (!path.endsWith('/')) path += '/';
-  const url = `${BACKEND}${path}${req.nextUrl.search}`;
+  const url = `${backend}${path}${req.nextUrl.search}`;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

@@ -1,4 +1,12 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://clearus-backend.onrender.com';
+const FALLBACK_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://clearus-backend.onrender.com';
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN; // e.g. "clearus.tech"
+
+export function getBackendUrl(tenant?: string): string {
+  if (API_DOMAIN && tenant) {
+    return `https://${tenant}-api.${API_DOMAIN}`;
+  }
+  return FALLBACK_URL;
+}
 
 export class ApiResponseError extends Error {
   constructor(
@@ -15,12 +23,14 @@ export class ApiResponseError extends Error {
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
   token?: string;
+  tenant?: string;
 };
 
 export async function apiRequest<T>(
   path: string,
-  { body, token, headers: extraHeaders, ...init }: RequestOptions = {},
+  { body, token, tenant, headers: extraHeaders, ...init }: RequestOptions = {},
 ): Promise<T> {
+  const baseUrl = getBackendUrl(tenant);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...extraHeaders as Record<string, string>,
@@ -30,7 +40,7 @@ export async function apiRequest<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
