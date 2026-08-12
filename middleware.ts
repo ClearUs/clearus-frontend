@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN; // e.g. "clearus.tech"
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN; // "clearus.tech"
 
 function extractTenant(hostname: string): string | null {
   if (!APP_DOMAIN) return null;
 
-  const bareHost = hostname.split(':')[0];
+  // Handles localhost/ports cleanly
+  const bareHost = hostname.split(':')[0].toLowerCase();
 
   if (
     bareHost === APP_DOMAIN ||
@@ -15,15 +16,20 @@ function extractTenant(hostname: string): string | null {
     return null;
   }
 
+  // Extracts tenant (e.g., "futo" from "futo.clearus.tech")
   return bareHost.replace(`.${APP_DOMAIN}`, '');
 }
 
 export function middleware(request: NextRequest) {
-  if (!APP_DOMAIN) return NextResponse.next();
+  // Prevent infinite loops on internally rewritten requests
+  if (request.headers.has('x-middleware-rewrite')) {
+    return NextResponse.next();
+  }
 
-  const hostname = request.headers.get('host') || '';
+  const hostname = request.nextUrl.hostname;
   const tenant = extractTenant(hostname);
 
+  // Bare domain or www -> serve standard root routes without rewriting
   if (!tenant) return NextResponse.next();
 
   const { pathname } = request.nextUrl;
@@ -38,30 +44,32 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If the path already contains the tenant code (e.g. /staff/futo from client-side nav),
-  // let it pass through — the route already resolves.
   const segments = pathname.split('/').filter(Boolean);
+
+  // If already prefixed with tenant (e.g., /staff/futo or /auth/futo), skip rewriting
   if (segments.length >= 2 && segments[1].toLowerCase() === tenant.toLowerCase()) {
     return NextResponse.next();
   }
 
   const url = request.nextUrl.clone();
 
-  if (pathname === '/') {
-    // futo.clearus.tech/ → serve /auth/futo
+  if (pathname === '/' || pathname === '/auth') {
+    // futo.clearus.tech/  OR  futo.clearus.tech/auth  -> /auth/futo
     url.pathname = `/auth/${tenant}`;
   } else {
-    // futo.clearus.tech/staff → serve /staff/futo
-    // futo.clearus.tech/auth  → serve /auth/futo
-    const firstSegment = segments[0];
-    url.pathname = `/${firstSegment}/${tenant}`;
+    // futo.clearus.tech/staff           -> /staff/futo
+    // futo.clearus.tech/staff/dashboard -> /staff/futo/dashboard
+    const restOfPath = segments.slice(1).join('/');
+    url.pathname = `/${segments[0]}/${tenant}${restOfPath ? `/${restOfPath}` : ''}`;
   }
 
-  return NextResponse.rewrite(url);
+  const response = NextResponse.rewrite(url);
+  response.headers.set('x-middleware-rewrite', 'true');
+  return response;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
