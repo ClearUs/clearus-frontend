@@ -8,13 +8,12 @@ import UniversityCrest from '@/components/landing/UniversityCrest';
 interface ResetPasswordPanelProps {
     code: string;
     initialEmail: string;
-    tenant: string;
     onBackToLogin: () => void;
 }
 
 type ResetStep = 'enter-email' | 'verify-and-reset' | 'success';
 
-export default function ResetPasswordPanel({ code, initialEmail, tenant, onBackToLogin }: ResetPasswordPanelProps) {
+export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }: ResetPasswordPanelProps) {
     const [step, setStep] = useState<ResetStep>(initialEmail ? 'verify-and-reset' : 'enter-email');
     const [email, setEmail] = useState(initialEmail);
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));

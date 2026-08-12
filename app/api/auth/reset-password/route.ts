@@ -1,18 +1,17 @@
 import { resetPasswordConfirm } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 
 export async function POST(request: Request) {
   let email: string;
   let code: string;
   let new_password: string;
-  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     code = body.code;
     new_password = body.new_password;
-    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -26,6 +25,8 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const tenant = getTenantFromHost(request.headers.get('host'));
 
   try {
     await resetPasswordConfirm({ email, code, new_password }, tenant);

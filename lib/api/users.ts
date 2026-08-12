@@ -10,7 +10,7 @@ export async function updatePassword(
     method: 'POST',
     body: payload,
     token,
-    // tenant,
+    tenant,
   });
 }
 
@@ -23,7 +23,7 @@ export async function updatePhoto(
     method: 'POST',
     body: payload,
     token,
-    // tenant,
+    tenant,
   });
 }
 
