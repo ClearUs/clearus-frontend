@@ -5,7 +5,7 @@ export async function getUnitsTree(token: string, tenant?: string): Promise<Unit
   return apiRequest<UnitNode[]>('/api/v1/iam/units/tree/', {
     method: 'GET',
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -13,7 +13,7 @@ export async function getUnitDetail(unitId: string, token: string, tenant?: stri
   return apiRequest<UnitDetail>(`/api/v1/iam/units/${unitId}/detail/`, {
     method: 'GET',
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -22,7 +22,7 @@ export async function createUnit(payload: CreateUnitPayload, token: string, tena
     method: 'POST',
     body: payload,
     token,
-    tenant,
+    // tenant,
   });
 }
 
@@ -36,6 +36,6 @@ export async function updateUnit(
     method: 'PATCH',
     body: payload,
     token,
-    tenant,
+    // tenant,
   });
 }

@@ -10,7 +10,7 @@ export async function loginStep1(email: string, password: string, tenant?: strin
   return apiRequest<LoginStep1Response>('/api/v1/auth/login/', {
     method: 'POST',
     body: { email, password },
-    tenant,
+    // tenant,
   });
 }
 
@@ -18,7 +18,7 @@ export async function loginVerify2fa(email: string, code: string, tenant?: strin
   return apiRequest<LoginStep2Response>('/api/v1/auth/login/verify-2fa/', {
     method: 'POST',
     body: { email, code },
-    tenant,
+    // tenant,
   });
 }
 
@@ -26,7 +26,7 @@ export async function refreshToken(refresh: string, tenant?: string): Promise<Re
   return apiRequest<RefreshedTokens>('/api/v1/auth/refresh', {
     method: 'POST',
     body: { refresh },
-    tenant,
+    // tenant,
   });
 }
 
@@ -34,7 +34,7 @@ export async function verifyToken(token: string, tenant?: string): Promise<Recor
   return apiRequest<Record<string, unknown>>('/api/v1/auth/verify', {
     method: 'POST',
     body: { token },
-    tenant,
+    // tenant,
   });
 }
 
@@ -45,6 +45,6 @@ export async function resetPasswordConfirm(
   return apiRequest('/api/v1/core/auth/password-reset/confirm/', {
     method: 'POST',
     body: payload,
-    tenant,
+    // tenant,
   });
 }
