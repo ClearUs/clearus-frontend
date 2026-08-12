@@ -43,7 +43,7 @@ export default function StaffTitleBlock({ institution, user, sidebarOpen, setSid
                 <div className="flex items-center gap-2">
                     <ThemeToggle />
                     <Link
-                        href="/"
+                        href={process.env.NEXT_PUBLIC_APP_DOMAIN!}
                         className="text-xs bg-white/5 hover:bg-white/10 text-heading/80 hover:text-heading px-3 py-2 rounded-xl border border-edge-subtle transition-all flex items-center gap-1.5 cursor-pointer font-medium font-sans"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
