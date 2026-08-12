@@ -24,7 +24,6 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [resolvedRole, setResolvedRole] = useState<User['role']>('staff');
 
-    const tenant = institution.code.toLowerCase();
     const staffDomain = institution.allowedDomains[0];
     const studentDomain = institution.allowedDomains[1] || staffDomain;
     const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN; // e.g. "clearus.tech"
@@ -44,7 +43,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim(), password, tenant }),
+                body: JSON.stringify({ email: email.trim(), password }),
             });
 
             if (!res.ok) {
@@ -74,10 +73,11 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     };
 
     const handleMfaAuthenticationSuccess = () => {
+        const code = institution.code.toLowerCase();
         if (appDomain) {
-            window.location.href = `https://${tenant}.${appDomain}/${resolvedRole}`;
+            window.location.href = `https://${code}.${appDomain}/${resolvedRole}`;
         } else {
-            router.push(`/${resolvedRole}/${institution.code.toLowerCase()}`);
+            router.push(`/${resolvedRole}/${code}`);
         }
     };
 
@@ -117,7 +117,6 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
                 <MfaPanel
                     code={institution.code}
                     email={email.trim()}
-                    tenant={tenant}
                     onBackToLogin={() => setCurrentSubView('login')}
                     onMfaSuccess={handleMfaAuthenticationSuccess}
                     onResendCode={handleResendCode}
@@ -128,7 +127,6 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
                 <ResetPasswordPanel
                     code={institution.code}
                     initialEmail={email.trim()}
-                    tenant={tenant}
                     onBackToLogin={() => setCurrentSubView('login')}
                 />
             )}

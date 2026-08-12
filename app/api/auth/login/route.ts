@@ -1,16 +1,15 @@
 import { loginStep1 } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 
 export async function POST(request: Request) {
   let email: string;
   let password: string;
-  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     password = body.password;
-    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -24,6 +23,8 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const tenant = getTenantFromHost(request.headers.get('host'));
 
   try {
     const data = await loginStep1(email, password, tenant);

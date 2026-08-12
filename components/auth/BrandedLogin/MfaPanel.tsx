@@ -8,13 +8,12 @@ import UniversityCrest from '@/components/landing/UniversityCrest';
 interface MfaPanelProps {
     code: string;
     email: string;
-    tenant: string;
     onBackToLogin: () => void;
     onMfaSuccess: () => void;
     onResendCode: () => Promise<void>;
 }
 
-export default function MfaPanel({ code, email, tenant, onBackToLogin, onMfaSuccess, onResendCode }: MfaPanelProps) {
+export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onResendCode }: MfaPanelProps) {
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [isShaking, setIsShaking] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);

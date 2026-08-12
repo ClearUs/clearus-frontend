@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { loginVerify2fa } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
   try {
@@ -15,13 +16,11 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 export async function POST(request: Request) {
   let email: string;
   let code: string;
-  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     code = body.code;
-    tenant = body.tenant;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -35,6 +34,8 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const tenant = getTenantFromHost(request.headers.get('host'));
 
   try {
     const data = await loginVerify2fa(email, code, tenant);
