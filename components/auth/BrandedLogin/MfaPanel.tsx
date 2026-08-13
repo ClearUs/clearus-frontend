@@ -22,6 +22,7 @@ export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onR
     const [isResending, setIsResending] = useState(false);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const verifyingRef = useRef(false);
 
     useEffect(() => {
         if (countdown <= 0) return;
@@ -40,6 +41,8 @@ export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onR
     };
 
     const triggerVerification = async (codeString: string) => {
+        if (verifyingRef.current) return;
+        verifyingRef.current = true;
         setIsVerifying(true);
         setErrorMsg('');
 
@@ -69,6 +72,7 @@ export default function MfaPanel({ code, email, onBackToLogin, onMfaSuccess, onR
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
         } finally {
             setIsVerifying(false);
+            verifyingRef.current = false;
         }
     };
 

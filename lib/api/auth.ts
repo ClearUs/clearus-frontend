@@ -38,6 +38,14 @@ export async function verifyToken(token: string, tenant?: string): Promise<Recor
   });
 }
 
+export async function resendOtp(email: string, tenant?: string): Promise<unknown> {
+  return apiRequest('/api/v1/iam/students/resend-otp/', {
+    method: 'POST',
+    body: { email },
+    tenant,
+  });
+}
+
 export async function resetPasswordConfirm(
   payload: PasswordResetConfirmPayload,
   tenant?: string,
