@@ -20,15 +20,59 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
     const [newPassword, setNewPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSendingOtp, setIsSendingOtp] = useState(!!initialEmail);
     const [errorMsg, setErrorMsg] = useState('');
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    const requestOtp = async (targetEmail: string) => {
+        setIsSendingOtp(true);
+        setErrorMsg('');
+        try {
+            const res = await fetch('/api/auth/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: targetEmail.trim() }),
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                setErrorMsg(data.detail || 'Failed to send verification code.');
+            }
+        } catch {
+            setErrorMsg('Network error. Please try again.');
+        } finally {
+            setIsSendingOtp(false);
+        }
+    };
 
     useEffect(() => {
         if (step === 'verify-and-reset') {
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
         }
     }, [step]);
+
+    useEffect(() => {
+        if (!initialEmail) return;
+        let cancelled = false;
+        fetch('/api/auth/resend-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: initialEmail.trim() }),
+        })
+            .then(res => {
+                if (cancelled) return;
+                if (!res.ok) return res.json().then(data => {
+                    setErrorMsg(data.detail || 'Failed to send verification code.');
+                });
+            })
+            .catch(() => {
+                if (!cancelled) setErrorMsg('Network error. Please try again.');
+            })
+            .finally(() => {
+                if (!cancelled) setIsSendingOtp(false);
+            });
+        return () => { cancelled = true; };
+    }, [initialEmail]);
 
     const handleOtpChange = (val: string, index: number) => {
         if (val && !/^\d$/.test(val)) return;
@@ -64,9 +108,10 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
         }
     };
 
-    const handleEmailSubmit = (e: React.FormEvent) => {
+    const handleEmailSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email.trim()) return;
+        await requestOtp(email);
         setStep('verify-and-reset');
     };
 
@@ -138,11 +183,23 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
                             </div>
                         </div>
 
+                        {errorMsg && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-rose-500/10 text-rose-300 border border-rose-500/15 p-3 rounded-xl flex items-start gap-2 text-xs font-sans leading-normal"
+                            >
+                                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                                <div>{errorMsg}</div>
+                            </motion.div>
+                        )}
+
                         <button
                             type="submit"
-                            className="w-full py-3 bg-green-500 hover:bg-green-400 font-bold text-black rounded-xl transition-colors text-xs tracking-widest uppercase shadow-lg shadow-green-500/10 cursor-pointer"
+                            disabled={isSendingOtp}
+                            className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-black rounded-xl transition-colors text-xs tracking-widest uppercase shadow-lg shadow-green-500/10 cursor-pointer"
                         >
-                            Continue
+                            {isSendingOtp ? 'Sending Code...' : 'Continue'}
                         </button>
 
                         <button
