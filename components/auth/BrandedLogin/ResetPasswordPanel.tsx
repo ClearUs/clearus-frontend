@@ -20,7 +20,7 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
     const [newPassword, setNewPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isSendingOtp, setIsSendingOtp] = useState(false);
+    const [isSendingOtp, setIsSendingOtp] = useState(!!initialEmail);
     const [errorMsg, setErrorMsg] = useState('');
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -52,11 +52,27 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
     }, [step]);
 
     useEffect(() => {
-        if (initialEmail) {
-            requestOtp(initialEmail);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        if (!initialEmail) return;
+        let cancelled = false;
+        fetch('/api/auth/resend-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: initialEmail.trim() }),
+        })
+            .then(res => {
+                if (cancelled) return;
+                if (!res.ok) return res.json().then(data => {
+                    setErrorMsg(data.detail || 'Failed to send verification code.');
+                });
+            })
+            .catch(() => {
+                if (!cancelled) setErrorMsg('Network error. Please try again.');
+            })
+            .finally(() => {
+                if (!cancelled) setIsSendingOtp(false);
+            });
+        return () => { cancelled = true; };
+    }, [initialEmail]);
 
     const handleOtpChange = (val: string, index: number) => {
         if (val && !/^\d$/.test(val)) return;
