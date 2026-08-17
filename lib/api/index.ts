@@ -2,6 +2,7 @@ export { apiRequest, getBackendUrl, ApiResponseError } from './client';
 export {
   loginStep1,
   loginVerify2fa,
+  request2faCode,
   refreshToken,
   verifyToken,
   resetPasswordConfirm,

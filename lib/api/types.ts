@@ -101,6 +101,11 @@ export interface PasswordResetConfirmPayload {
   new_password: string;
 }
 
+export interface Request2faCodePayload {
+  email: string;
+  password?: string;
+}
+
 export interface UpdatePhotoPayload {
   image_url: string;
 }

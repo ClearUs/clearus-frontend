@@ -4,14 +4,11 @@ import type {
   LoginStep2Response,
   RefreshedTokens,
   PasswordResetConfirmPayload,
+  Request2faCodePayload,
 } from './types';
 
 export async function loginStep1(email: string, password: string, tenant?: string): Promise<LoginStep1Response> {
-  return apiRequest<LoginStep1Response>('/api/v1/auth/login/', {
-    method: 'POST',
-    body: { email, password },
-    tenant,
-  });
+  return request2faCode<LoginStep1Response>({ email, password }, tenant);
 }
 
 export async function loginVerify2fa(email: string, code: string, tenant?: string): Promise<LoginStep2Response> {
@@ -38,12 +35,19 @@ export async function verifyToken(token: string, tenant?: string): Promise<Recor
   });
 }
 
-export async function resendOtp(email: string, tenant?: string): Promise<unknown> {
-  return apiRequest('/api/v1/iam/students/resend-otp/', {
+export async function request2faCode<T = unknown>(
+  payload: Request2faCodePayload,
+  tenant?: string,
+): Promise<T> {
+  return apiRequest<T>('/api/v1/auth/2fa/request-code', {
     method: 'POST',
-    body: { email },
+    body: payload,
     tenant,
   });
+}
+
+export async function resendOtp(email: string, tenant?: string): Promise<unknown> {
+  return request2faCode({ email }, tenant);
 }
 
 export async function resetPasswordConfirm(
