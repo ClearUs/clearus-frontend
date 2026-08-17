@@ -65,11 +65,14 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     };
 
     const handleResendCode = async () => {
-        await fetch('/api/auth/login', {
+        const res = await fetch('/api/auth/resend-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim(), password }),
+            body: JSON.stringify({ email: email.trim() }),
         });
+        if (!res.ok) {
+            throw new Error('Failed to resend verification code.');
+        }
     };
 
     const handleMfaAuthenticationSuccess = () => {
