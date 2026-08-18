@@ -53,6 +53,19 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
                 return;
             }
 
+            const codeRes = await fetch('/api/auth/request-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim(), password }),
+            });
+
+            if (!codeRes.ok) {
+                const data = await codeRes.json();
+                setErrorMsg(data.detail || 'Failed to send verification code.');
+                setIsLoading(false);
+                return;
+            }
+
             const domainPart = email.trim().split('@')[1];
             const role = domainPart?.toLowerCase() === studentDomain.toLowerCase() ? 'student' : 'staff';
             setResolvedRole(role);

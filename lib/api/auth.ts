@@ -8,7 +8,11 @@ import type {
 } from './types';
 
 export async function loginStep1(email: string, password: string, tenant?: string): Promise<LoginStep1Response> {
-  return request2faCode<LoginStep1Response>({ email, password }, tenant);
+  return apiRequest<LoginStep1Response>('/api/v1/auth/login/', {
+    method: 'POST',
+    body: { email, password },
+    tenant,
+  });
 }
 
 export async function loginVerify2fa(email: string, code: string, tenant?: string): Promise<LoginStep2Response> {
