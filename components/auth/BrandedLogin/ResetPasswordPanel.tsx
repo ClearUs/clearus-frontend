@@ -29,7 +29,7 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
         setIsSendingOtp(true);
         setErrorMsg('');
         try {
-            const res = await fetch('/api/auth/resend-otp', {
+            const res = await fetch('/api/auth/request-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: targetEmail.trim() }),
@@ -54,7 +54,7 @@ export default function ResetPasswordPanel({ code, initialEmail, onBackToLogin }
     useEffect(() => {
         if (!initialEmail) return;
         let cancelled = false;
-        fetch('/api/auth/resend-otp', {
+        fetch('/api/auth/request-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: initialEmail.trim() }),

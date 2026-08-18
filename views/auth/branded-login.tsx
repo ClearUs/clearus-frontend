@@ -65,7 +65,7 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
     };
 
     const handleResendCode = async () => {
-        const res = await fetch('/api/auth/resend-otp', {
+        const res = await fetch('/api/auth/request-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email.trim() }),

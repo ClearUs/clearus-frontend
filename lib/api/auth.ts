@@ -46,10 +46,6 @@ export async function request2faCode<T = unknown>(
   });
 }
 
-export async function resendOtp(email: string, tenant?: string): Promise<unknown> {
-  return request2faCode({ email }, tenant);
-}
-
 export async function resetPasswordConfirm(
   payload: PasswordResetConfirmPayload,
   tenant?: string,
