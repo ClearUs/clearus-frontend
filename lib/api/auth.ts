@@ -43,7 +43,7 @@ export async function request2faCode<T = unknown>(
   payload: Request2faCodePayload,
   tenant?: string,
 ): Promise<T> {
-  return apiRequest<T>('/api/v1/auth/2fa/request-code', {
+  return apiRequest<T>('/api/v1/core/auth/2fa/request-code', {
     method: 'POST',
     body: payload,
     tenant,
