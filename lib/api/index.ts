@@ -7,6 +7,8 @@ export {
   verifyToken,
   resetPasswordConfirm,
   verifyStudentEmail,
+  verify2faCode,
+  type Verify2faCodeResponse,
 } from './auth';
 export {
   getUnitsTree,
@@ -15,7 +17,15 @@ export {
   updateUnit,
   getRegistrationUnits,
   registerStudent,
+  getUnitPermissions,
+  listStaffMembers,
+  inviteStaffMember,
+  acceptStaffInvitation,
+  toggleStaffRoleStatus,
   type RegisterStudentPayload,
+  type StaffMember,
+  type InviteStaffPayload,
+  type AcceptStaffInvitationPayload,
 } from './units';
 export {
   createWorkflowTemplate,
@@ -39,7 +49,9 @@ export {
   type StudentProfile,
 } from './users';
 export { uploadVaultAsset, downloadVaultAsset, type UploadAssetResponse } from './vault';
+export { listClientPortals, type ClientPortal } from './portals';
 export { clientFetch, ClientApiError } from './client-fetch';
 export { flattenUnitTree, orgNodeToCreatePayload } from './mappers';
 export type * from './types';
+
 

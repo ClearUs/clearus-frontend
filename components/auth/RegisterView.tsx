@@ -14,6 +14,7 @@ import {
   GraduationCap,
   UserX,
   MailX,
+  ChevronDown,
 } from 'lucide-react';
 import OtpInput from './OtpInput';
 
@@ -28,15 +29,16 @@ type Method = 'school-email' | 'matric';
 type Step = 'enter-id' | 'verify-email' | 'verify-student' | 'details' | 'password' | 'complete'
   | 'error-matric-not-found' | 'error-already-registered' | 'error-not-school-email' | 'error-email-exists';
 
-const STEPS_EMAIL: Step[] = ['enter-id', 'verify-email', 'details', 'password', 'complete'];
-const STEPS_MATRIC: Step[] = ['enter-id', 'verify-student', 'details', 'password', 'complete'];
+const STEPS_EMAIL: Step[] = ['enter-id', 'details', 'password', 'verify-email', 'complete'];
+const STEPS_MATRIC: Step[] = ['enter-id', 'verify-student', 'details', 'password', 'verify-email', 'complete'];
 
 function StepIndicator({ steps, current, method }: { steps: Step[]; current: Step; method: Method }) {
   const labels = method === 'school-email'
-    ? ['Email', 'Verify', 'Details', 'Password']
-    : ['Matric', 'Verify', 'Details', 'Password'];
-  const stepsWithoutComplete = steps.filter(s => s !== 'complete');
-  const currentIdx = (stepsWithoutComplete as Step[]).indexOf(current);
+    ? ['Email', 'Details', 'Password', 'Verify']
+    : ['Matric', 'Details', 'Password', 'Verify'];
+  const stepsWithoutComplete = steps.filter(s => s !== 'complete' && s !== 'verify-student');
+  const normalizedCurrent = current === 'verify-student' ? 'enter-id' : current;
+  const currentIdx = (stepsWithoutComplete as Step[]).indexOf(normalizedCurrent);
 
   return (
     <div className="flex items-center gap-2 mb-8">
@@ -78,6 +80,8 @@ export default function RegisterView({
   const [fullName, setFullName] = useState('');
   const [department, setDepartment] = useState('');
   const [level, setLevel] = useState('');
+  const [availableUnits, setAvailableUnits] = useState<{ id: string; name: string }[]>([]);
+  const [selectedUnitId, setSelectedUnitId] = useState<string>('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -88,6 +92,21 @@ export default function RegisterView({
   const [verifyCountdown, setVerifyCountdown] = useState(120);
 
   const steps = method === 'school-email' ? STEPS_EMAIL : STEPS_MATRIC;
+
+  useEffect(() => {
+    fetch('/api/proxy/api/v1/iam/students/registration/units/')
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setAvailableUnits(data);
+          if (data[0]?.id) {
+            setSelectedUnitId(data[0].id);
+            setDepartment(data[0].name);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (step !== 'verify-email' || verifyCountdown <= 0) return;
@@ -105,9 +124,14 @@ export default function RegisterView({
   };
 
   const goPrev = () => {
-    const idx = steps.indexOf(step);
-    if (idx > 0) {
-      setStep(steps[idx - 1]);
+    if (step === 'details') {
+      setStep(method === 'school-email' ? 'enter-id' : 'verify-student');
+    } else if (step === 'verify-student') {
+      setStep('enter-id');
+    } else if (step === 'password') {
+      setStep('details');
+    } else if (step === 'verify-email') {
+      setStep('password');
     } else {
       onBack();
     }
@@ -135,8 +159,7 @@ export default function RegisterView({
         return;
       }
       if (method === 'school-email') {
-        setVerifyCountdown(120);
-        setStep('verify-email');
+        setStep('details');
       } else {
         setStep('verify-student');
       }
@@ -157,14 +180,14 @@ export default function RegisterView({
       const res = await fetch('/api/auth/register/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), code }),
+        body: JSON.stringify({ email: email.trim(), code, tenant: institutionCode }),
       });
       if (!res.ok) {
         const data = await res.json();
         setErrorMsg(data.detail || 'Invalid code. Please try again.');
         return;
       }
-      setStep('details');
+      setStep('complete');
     } catch {
       setErrorMsg('Network error. Please try again.');
     } finally {
@@ -174,6 +197,11 @@ export default function RegisterView({
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
+    if (!level) {
+      setErrorMsg('Please select your level.');
+      return;
+    }
     setStep('password');
   };
 
@@ -194,11 +222,12 @@ export default function RegisterView({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: method === 'school-email' ? email.trim() : undefined,
-          matric: method === 'matric' ? matric.trim() : undefined,
+          email: email.trim(),
+          matric: matric.trim() || undefined,
           full_name: fullName.trim(),
           department: department.trim(),
-          level: level.trim(),
+          academic_unit_id: selectedUnitId || undefined,
+          level: String(level).replace(/\D/g, '') || '100',
           password,
           institution: institutionCode,
         }),
@@ -208,7 +237,8 @@ export default function RegisterView({
         setErrorMsg(data.detail || 'Registration failed. Please try again.');
         return;
       }
-      setStep('complete');
+      setVerifyCountdown(120);
+      setStep('verify-email');
     } catch {
       setErrorMsg('Network error. Please try again.');
     } finally {
@@ -404,57 +434,6 @@ export default function RegisterView({
           </>
         )}
 
-        {step === 'verify-email' && (
-          <>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
-              Verify your email
-            </h1>
-            <p className="text-gray-500 text-sm mb-8">
-              Enter the 6-digit code we sent to <span className="font-medium text-gray-700">{email}</span>.
-            </p>
-
-            <form onSubmit={handleVerifySubmit} className="space-y-5">
-              <div className="flex justify-center mb-2">
-                <OtpInput value={digits} onChange={handleDigitsChange} disabled={isLoading} />
-              </div>
-
-              {errorMsg && (
-                <div className="bg-red-50 text-red-700 border border-red-100 p-3.5 rounded-xl flex items-start gap-2.5 text-sm">
-                  <AlertCircle className="w-4.5 h-4.5 text-red-500 shrink-0 mt-0.5" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading || digits.join('').length < 6}
-                className="w-full py-3.5 bg-green-700 hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-sm cursor-pointer"
-              >
-                {isLoading ? 'Verifying...' : 'Verify email'}
-              </button>
-            </form>
-
-            <p className="text-center text-sm text-gray-400 mt-4">
-              {verifyCountdown > 0 ? (
-                <>Resend code in {Math.floor(verifyCountdown / 60).toString().padStart(2, '0')}:{(verifyCountdown % 60).toString().padStart(2, '0')}</>
-              ) : (
-                <button type="button" onClick={async () => {
-                  setVerifyCountdown(120);
-                  try {
-                    await fetch('/api/auth/request-code', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ email: email.trim(), purpose: 'registration' }),
-                    });
-                  } catch { /* silent — countdown already reset */ }
-                }} className="text-green-700 hover:underline font-medium cursor-pointer">
-                  Resend code
-                </button>
-              )}
-            </p>
-          </>
-        )}
-
         {step === 'verify-student' && (
           <>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
@@ -518,27 +497,76 @@ export default function RegisterView({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">Department</label>
-                <input
-                  type="text"
-                  value={department}
-                  onChange={e => setDepartment(e.target.value)}
-                  placeholder="Computer Science"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
-                  required
-                />
+                <label className="block text-sm font-medium text-gray-700">Academic Unit / Department</label>
+                {availableUnits.length > 0 ? (
+                  <select
+                    value={selectedUnitId}
+                    onChange={(e) => {
+                      setSelectedUnitId(e.target.value);
+                      const unit = availableUnits.find(u => u.id === e.target.value);
+                      if (unit) setDepartment(unit.name);
+                    }}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="">Select your department / unit</option>
+                    {availableUnits.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={department}
+                    onChange={e => setDepartment(e.target.value)}
+                    placeholder="Computer Science"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
+                    required
+                  />
+                )}
               </div>
+
+              {method === 'matric' && (
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">Email address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="you@student.futo.edu.ng"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400">Your verification OTP code will be sent to this email.</p>
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700">Level</label>
-                <input
-                  type="text"
-                  value={level}
-                  onChange={e => setLevel(e.target.value)}
-                  placeholder="400 Level"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
-                  required
-                />
+                <div className="relative">
+                  <select
+                    value={level}
+                    onChange={e => setLevel(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer appearance-none"
+                    required
+                  >
+                    <option value="" disabled>Select your level</option>
+                    <option value="100 Level">100 Level</option>
+                    <option value="200 Level">200 Level</option>
+                    <option value="300 Level">300 Level</option>
+                    <option value="400 Level">400 Level</option>
+                    <option value="500 Level">500 Level</option>
+                    <option value="600 Level">600 Level</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {errorMsg && (
@@ -548,12 +576,21 @@ export default function RegisterView({
                 </div>
               )}
 
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Continue <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  className="flex-1 py-3.5 border border-gray-200 text-gray-700 font-semibold rounded-xl transition-colors text-sm cursor-pointer hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  Continue <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </form>
           </>
         )}
@@ -645,6 +682,66 @@ export default function RegisterView({
                 </button>
               </div>
             </form>
+          </>
+        )}
+
+        {step === 'verify-email' && (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
+              Verify your email
+            </h1>
+            <p className="text-gray-500 text-sm mb-8">
+              Enter the 6-digit verification code we sent to <span className="font-medium text-gray-700">{email}</span> to activate your account.
+            </p>
+
+            <form onSubmit={handleVerifySubmit} className="space-y-5">
+              <div className="flex justify-center mb-2">
+                <OtpInput value={digits} onChange={handleDigitsChange} disabled={isLoading} />
+              </div>
+
+              {errorMsg && (
+                <div className="bg-red-50 text-red-700 border border-red-100 p-3.5 rounded-xl flex items-start gap-2.5 text-sm">
+                  <AlertCircle className="w-4.5 h-4.5 text-red-500 shrink-0 mt-0.5" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  className="flex-1 py-3.5 border border-gray-200 text-gray-700 font-semibold rounded-xl transition-colors text-sm cursor-pointer hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || digits.join('').length < 6}
+                  className="flex-1 py-3.5 bg-green-700 hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-sm cursor-pointer"
+                >
+                  {isLoading ? 'Verifying...' : 'Verify & Complete'}
+                </button>
+              </div>
+            </form>
+
+            <p className="text-center text-sm text-gray-400 mt-4">
+              {verifyCountdown > 0 ? (
+                <>Resend code in {Math.floor(verifyCountdown / 60).toString().padStart(2, '0')}:{(verifyCountdown % 60).toString().padStart(2, '0')}</>
+              ) : (
+                <button type="button" onClick={async () => {
+                  setVerifyCountdown(120);
+                  try {
+                    await fetch('/api/auth/request-code', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: email.trim(), purpose: 'registration' }),
+                    });
+                  } catch { /* silent */ }
+                }} className="text-green-700 hover:underline font-medium cursor-pointer">
+                  Resend code
+                </button>
+              )}
+            </p>
           </>
         )}
       </div>

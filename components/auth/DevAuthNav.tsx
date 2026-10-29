@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Bug } from 'lucide-react';
+import { isDevMode } from '@/lib/mode';
 import Link from "next/link";
 
 interface DevAuthNavProps {
@@ -20,7 +21,7 @@ const AUTH_SCREENS = [
 export default function DevAuthNav({ currentView, onNavigate }: DevAuthNavProps) {
   const [open, setOpen] = useState(false);
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (!isDevMode()) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-9999">
