@@ -25,16 +25,22 @@ export async function clientFetch<T>(
   path: string,
   options: FetchOptions = {},
 ): Promise<T> {
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
   const buildRequest = () => {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(!isFormData && options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...(options.headers as Record<string, string>),
     };
 
     return fetch(`/api/proxy${path}`, {
       ...options,
       headers,
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      body: isFormData
+        ? (options.body as FormData)
+        : options.body !== undefined
+        ? JSON.stringify(options.body)
+        : undefined,
     });
   };
 
@@ -59,5 +65,9 @@ export async function clientFetch<T>(
 
   const text = await res.text();
   if (!text) return {} as T;
-  return JSON.parse(text) as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as unknown as T;
+  }
 }

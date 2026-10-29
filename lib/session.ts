@@ -59,7 +59,24 @@ export async function getCurrentUser(schoolCode: string): Promise<User | null> {
 
 export async function requireRole(schoolCode: string, role: AppRole): Promise<User> {
   const user = await getCurrentUser(schoolCode);
-  if (!user) redirect(`/auth/${schoolCode}`);
+  if (!user) {
+    if (process.env.NODE_ENV === 'development') {
+      const code = schoolCode.toUpperCase();
+      const institution = getInstitutionByCode(schoolCode);
+      const fallbackDept = institution?.departments[0] ?? 'General Studies';
+      return {
+        id: `DEV/${code}/0001`,
+        name: 'Chinedu Okafor Johnpaul',
+        email: 'chinedu@futo.edu.ng',
+        role,
+        schoolCode: code,
+        ...(role === 'student'
+          ? { matricNo: `${code}/CS/20/0000`, department: fallbackDept }
+          : { staffId: `STAFF/${code}/0001`, department: fallbackDept }),
+      };
+    }
+    redirect(`/auth/${schoolCode}`);
+  }
   if (user.role !== role) redirect(`/${user.role}/${schoolCode}`);
   return user;
 }

@@ -39,3 +39,32 @@ export async function updateUnit(
     tenant,
   });
 }
+
+export interface RegisterStudentPayload {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  matric_number: string;
+  academic_unit_id: string;
+  level: number;
+}
+
+export async function getRegistrationUnits(tenant?: string): Promise<UnitNode[]> {
+  return apiRequest<UnitNode[]>('/api/v1/iam/students/registration/units/', {
+    method: 'GET',
+    tenant,
+  });
+}
+
+export async function registerStudent(
+  payload: RegisterStudentPayload,
+  tenant?: string,
+): Promise<{ id: string }> {
+  return apiRequest<{ id: string }>('/api/v1/iam/students/register/', {
+    method: 'POST',
+    body: payload,
+    tenant,
+  });
+}
+

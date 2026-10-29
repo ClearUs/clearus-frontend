@@ -40,13 +40,13 @@ export const INSTITUTIONS: Institution[] = [
     primaryColor: 'red',
     accentColor: 'amber',
     colorTheme: {
-      primaryBg: 'bg-red-950',
-      primaryText: 'text-red-950',
-      primaryBorder: 'border-red-950',
+      primaryBg: 'bg-red-600',
+      primaryText: 'text-red-400',
+      primaryBorder: 'border-red-500/20',
       accentBg: 'bg-amber-500',
-      accentText: 'text-amber-500',
-      bannerGradient: 'from-red-950 via-red-900 to-amber-950',
-      lightAccentBg: 'bg-amber-50 text-amber-800 border-amber-200',
+      accentText: 'text-amber-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-red-950',
+      lightAccentBg: 'bg-red-950/20 text-red-400 border-red-500/20',
     },
     allowedDomains: ['unilag.edu.ng', 'live.unilag.edu.ng'],
     departments: [
@@ -64,6 +64,37 @@ export const INSTITUTIONS: Institution[] = [
     }
   },
   {
+    code: 'UNN',
+    name: 'University of Nigeria',
+    shortName: 'UNN',
+    motto: 'To Restore the Dignity of Man',
+    primaryColor: 'emerald',
+    accentColor: 'emerald',
+    colorTheme: {
+      primaryBg: 'bg-emerald-600',
+      primaryText: 'text-emerald-400',
+      primaryBorder: 'border-emerald-500/20',
+      accentBg: 'bg-emerald-500',
+      accentText: 'text-emerald-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-emerald-950',
+      lightAccentBg: 'bg-emerald-950/20 text-emerald-400 border-emerald-500/20',
+    },
+    allowedDomains: ['unn.edu.ng', 'student.unn.edu.ng'],
+    departments: [
+      'Electronic Engineering',
+      'Computer Science',
+      'Pharmacy',
+      'Microbiology',
+      'Accountancy',
+      'Mass Communication'
+    ],
+    stats: {
+      totalStudents: 22800,
+      pendingClearances: 1650,
+      clearedThisMonth: 4210
+    }
+  },
+  {
     code: 'UI',
     name: 'University of Ibadan',
     shortName: 'UI',
@@ -71,13 +102,13 @@ export const INSTITUTIONS: Institution[] = [
     primaryColor: 'green',
     accentColor: 'yellow',
     colorTheme: {
-      primaryBg: 'bg-green-950',
-      primaryText: 'text-green-950',
-      primaryBorder: 'border-green-950',
+      primaryBg: 'bg-green-600',
+      primaryText: 'text-green-400',
+      primaryBorder: 'border-green-500/20',
       accentBg: 'bg-yellow-500',
-      accentText: 'text-yellow-500',
-      bannerGradient: 'from-green-950 via-green-900 to-yellow-950',
-      lightAccentBg: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+      accentText: 'text-yellow-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-green-950',
+      lightAccentBg: 'bg-green-950/20 text-green-400 border-green-500/20',
     },
     allowedDomains: ['ui.edu.ng', 'stu.ui.edu.ng'],
     departments: [
@@ -95,37 +126,69 @@ export const INSTITUTIONS: Institution[] = [
     }
   },
   {
-    code: 'ABU',
-    name: 'Ahmadu Bello University',
-    shortName: 'ABU',
-    motto: 'Discipline, Self-Reliance and Excellence',
-    primaryColor: 'green',
-    accentColor: 'green',
+    code: 'CU',
+    name: 'Covenant University',
+    shortName: 'CU',
+    motto: 'Raising a New Generation of Leaders',
+    primaryColor: 'purple',
+    accentColor: 'amber',
     colorTheme: {
-      primaryBg: 'bg-green-800',
-      primaryText: 'text-green-800',
-      primaryBorder: 'border-green-800',
-      accentBg: 'bg-green-600',
-      accentText: 'text-green-600',
-      bannerGradient: 'from-green-950 via-green-900 to-green-950',
-      lightAccentBg: 'bg-green-50 text-green-800 border-green-200',
+      primaryBg: 'bg-purple-600',
+      primaryText: 'text-purple-400',
+      primaryBorder: 'border-purple-500/20',
+      accentBg: 'bg-amber-500',
+      accentText: 'text-amber-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-purple-950',
+      lightAccentBg: 'bg-purple-950/20 text-purple-400 border-purple-500/20',
     },
-    allowedDomains: ['abu.edu.ng', 'student.abu.edu.ng'],
+    allowedDomains: ['covenantuniversity.edu.ng', 'student.covenantuniversity.edu.ng'],
     departments: [
+      'Computer Science',
+      'Electrical & Information Engineering',
+      'Economics',
       'Architecture',
-      'Pharmacy',
-      'Chemical Engineering',
-      'Business Administration',
-      'Veterinary Medicine',
-      'Geology'
+      'Accounting',
+      'International Relations'
     ],
     stats: {
-      totalStudents: 21200,
-      pendingClearances: 1730,
-      clearedThisMonth: 4120
+      totalStudents: 9200,
+      pendingClearances: 340,
+      clearedThisMonth: 1890
+    }
+  },
+  {
+    code: 'BU',
+    name: 'Babcock University',
+    shortName: 'Babcock',
+    motto: 'Knowledge, Truth, Service',
+    primaryColor: 'blue',
+    accentColor: 'amber',
+    colorTheme: {
+      primaryBg: 'bg-blue-600',
+      primaryText: 'text-blue-400',
+      primaryBorder: 'border-blue-500/20',
+      accentBg: 'bg-amber-500',
+      accentText: 'text-amber-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-blue-950',
+      lightAccentBg: 'bg-blue-950/20 text-blue-400 border-blue-500/20',
+    },
+    allowedDomains: ['babcock.edu.ng', 'student.babcock.edu.ng'],
+    departments: [
+      'Software Engineering',
+      'Public Health',
+      'Nursing Science',
+      'Business Administration',
+      'Mass Communication',
+      'Information Resources Management'
+    ],
+    stats: {
+      totalStudents: 11400,
+      pendingClearances: 520,
+      clearedThisMonth: 2150
     }
   }
 ];
+
 
 export const getInstitutionByCode = (code: string): Institution | undefined => {
   return INSTITUTIONS.find(inst => inst.code.toUpperCase() === code.toUpperCase());

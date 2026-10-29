@@ -60,3 +60,16 @@ export async function resetPasswordConfirm(
     tenant,
   });
 }
+
+export async function verifyStudentEmail(
+  email: string,
+  code: string,
+  tenant?: string,
+): Promise<LoginStep2Response> {
+  return apiRequest<LoginStep2Response>('/api/v1/core/auth/verify-email/', {
+    method: 'POST',
+    body: { email, code },
+    tenant,
+  });
+}
+
