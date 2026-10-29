@@ -114,7 +114,7 @@ export default function ResetPasswordView({
               Forgot your password?
             </h1>
             <p className="text-gray-500 text-sm mb-8">
-              Enter your matric number or email linked to your account and we'll send a verification code.
+              Enter your matric number or email linked to your account and we&apos;ll send a verification code.
             </p>
             <form onSubmit={handleRequestCode} className="space-y-5">
               <div className="space-y-1.5">

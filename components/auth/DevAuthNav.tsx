@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Bug } from 'lucide-react';
+import Link from "next/link";
 
 interface DevAuthNavProps {
   currentView?: string;
@@ -50,12 +51,12 @@ export default function DevAuthNav({ currentView, onNavigate }: DevAuthNavProps)
           ))}
           <div className="border-t border-gray-800 my-1" />
           <p className="text-[10px] text-gray-500 uppercase tracking-wider px-2 py-1">Pages</p>
-          <a href="/auth" className="block w-full text-left text-xs px-2 py-1.5 rounded text-gray-300 hover:bg-gray-800">
+          <Link href="/auth" className="block w-full text-left text-xs px-2 py-1.5 rounded text-gray-300 hover:bg-gray-800">
             Select University
-          </a>
-          <a href="/auth/signed-out" className="block w-full text-left text-xs px-2 py-1.5 rounded text-gray-300 hover:bg-gray-800">
+          </Link>
+          <Link href="/auth/signed-out" className="block w-full text-left text-xs px-2 py-1.5 rounded text-gray-300 hover:bg-gray-800">
             Signed Out
-          </a>
+          </Link>
         </div>
       )}
     </div>
