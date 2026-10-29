@@ -1,5 +1,6 @@
 import { apiRequest } from './client';
 import { clientFetch } from './client-fetch';
+import { isDevMode } from '@/lib/mode';
 import type {
   WorkflowTemplate,
   CreateTemplatePayload,
@@ -112,6 +113,9 @@ export async function clientSubmitClearanceStep(
     });
     return { success: true, simulated: false, data };
   } catch (error) {
+    if (!isDevMode()) {
+      throw error;
+    }
     console.warn(
       `[Workflows API Simulation Fallback] Submit step ${stepId} fallback activated:`,
       error,
@@ -138,6 +142,9 @@ export async function clientStartClearanceSession(
     });
     return { success: true, simulated: false, data };
   } catch (error) {
+    if (!isDevMode()) {
+      throw error;
+    }
     console.warn(
       `[Workflows API Simulation Fallback] Start session for student ${studentProfileId} fallback:`,
       error,

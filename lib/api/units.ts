@@ -68,3 +68,85 @@ export async function registerStudent(
   });
 }
 
+export async function getUnitPermissions(
+  unitId: string,
+  token: string,
+  tenant?: string,
+): Promise<string[]> {
+  return apiRequest<string[]>(`/api/v1/iam/units/${unitId}/permissions/`, {
+    method: 'GET',
+    token,
+    tenant,
+  });
+}
+
+export interface StaffMember {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role_name?: string;
+  is_active?: boolean;
+}
+
+export interface InviteStaffPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  unit_id: string;
+  role_name: string;
+  permissions?: string[];
+  select_inheritable_permissions?: boolean;
+}
+
+export interface AcceptStaffInvitationPayload {
+  uid: string;
+  token: string;
+  new_password: string;
+}
+
+export async function listStaffMembers(token: string, tenant?: string): Promise<StaffMember[]> {
+  return apiRequest<StaffMember[]>('/api/v1/iam/staff/', {
+    method: 'GET',
+    token,
+    tenant,
+  });
+}
+
+export async function inviteStaffMember(
+  payload: InviteStaffPayload,
+  token: string,
+  tenant?: string,
+): Promise<{ id: string }> {
+  return apiRequest<{ id: string }>('/api/v1/iam/staff/invite/', {
+    method: 'POST',
+    body: payload,
+    token,
+    tenant,
+  });
+}
+
+export async function acceptStaffInvitation(
+  payload: AcceptStaffInvitationPayload,
+  tenant?: string,
+): Promise<unknown> {
+  return apiRequest('/api/v1/iam/staff/accept-invitation/', {
+    method: 'POST',
+    body: payload,
+    tenant,
+  });
+}
+
+export async function toggleStaffRoleStatus(
+  staffRoleId: string,
+  token: string,
+  tenant?: string,
+): Promise<unknown> {
+  return apiRequest(`/api/v1/iam/staff/roles/${staffRoleId}/toggle-status/`, {
+    method: 'PATCH',
+    token,
+    tenant,
+  });
+}
+
+

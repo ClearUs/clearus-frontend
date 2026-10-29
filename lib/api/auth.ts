@@ -73,3 +73,21 @@ export async function verifyStudentEmail(
   });
 }
 
+export interface Verify2faCodeResponse {
+  two_factor_token: string;
+}
+
+export async function verify2faCode(
+  code: string,
+  token?: string,
+  tenant?: string,
+): Promise<Verify2faCodeResponse> {
+  return apiRequest<Verify2faCodeResponse>('/api/v1/core/auth/2fa/verify/', {
+    method: 'POST',
+    body: { code },
+    token,
+    tenant,
+  });
+}
+
+

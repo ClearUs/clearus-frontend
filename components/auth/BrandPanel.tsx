@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { CircleCheckBig } from 'lucide-react';
 import Image from 'next/image';
 
 interface BrandPanelProps {

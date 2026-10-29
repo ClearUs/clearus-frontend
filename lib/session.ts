@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getInstitutionByCode } from '@/data/institution';
+import { isDevMode } from '@/lib/mode';
 import type { User } from '@/types';
 
 export type AppRole = User['role'];
@@ -60,7 +61,7 @@ export async function getCurrentUser(schoolCode: string): Promise<User | null> {
 export async function requireRole(schoolCode: string, role: AppRole): Promise<User> {
   const user = await getCurrentUser(schoolCode);
   if (!user) {
-    if (process.env.NODE_ENV === 'development') {
+    if (isDevMode()) {
       const code = schoolCode.toUpperCase();
       const institution = getInstitutionByCode(schoolCode);
       const fallbackDept = institution?.departments[0] ?? 'General Studies';

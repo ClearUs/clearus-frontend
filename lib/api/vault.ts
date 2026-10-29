@@ -1,6 +1,7 @@
 'use client';
 
 import { clientFetch } from './client-fetch';
+import { isDevMode } from '@/lib/mode';
 
 export interface UploadAssetResponse {
   id: string;
@@ -12,8 +13,9 @@ export interface UploadAssetResponse {
 
 /**
  * Uploads a file asset to the ClearUs Vault.
- * Uses the live backend API (/api/v1/vault/upload/) via proxy,
- * with padded fallback simulation if the backend is unreachable or returns an error.
+ * Uses the live backend API (/api/v1/vault/upload/) via proxy.
+ * In development, provides padded simulation fallback if unseeded.
+ * In production, strictly throws errors on upstream failure.
  */
 export async function uploadVaultAsset(file: File): Promise<UploadAssetResponse> {
   try {
@@ -29,6 +31,10 @@ export async function uploadVaultAsset(file: File): Promise<UploadAssetResponse>
       return res;
     }
 
+    if (!isDevMode()) {
+      throw new Error('Upload succeeded upstream but did not return a valid asset ID.');
+    }
+
     return {
       id: `sim_vault_${Date.now()}`,
       name: file.name,
@@ -36,7 +42,10 @@ export async function uploadVaultAsset(file: File): Promise<UploadAssetResponse>
       simulated: true,
     };
   } catch (error) {
-    console.warn('[Vault API Simulation Fallback] Upload failed, using simulated asset:', error);
+    if (!isDevMode()) {
+      throw error;
+    }
+    console.warn('[Vault API Simulation Fallback] Upload failed, using simulated asset in dev:', error);
     return {
       id: `sim_vault_${Date.now()}`,
       name: file.name,
@@ -48,8 +57,8 @@ export async function uploadVaultAsset(file: File): Promise<UploadAssetResponse>
 
 /**
  * Downloads an asset from the ClearUs Vault.
- * First queries the live backend API (/api/v1/vault/{asset_id}/download/),
- * falling back to a simulated generated Blob if unseeded or unavailable.
+ * Queries the live backend API (/api/v1/vault/{asset_id}/download/).
+ * In production, strictly throws on download failure.
  */
 export async function downloadVaultAsset(
   assetId: string,
@@ -62,11 +71,17 @@ export async function downloadVaultAsset(
       triggerBrowserDownload(blob, fileName);
       return blob;
     }
+    if (!isDevMode()) {
+      throw new Error(`Download failed with status ${res.status}`);
+    }
   } catch (error) {
-    console.warn('[Vault API Simulation Fallback] Download failed, creating simulated blob:', error);
+    if (!isDevMode()) {
+      throw error;
+    }
+    console.warn('[Vault API Simulation Fallback] Download failed, creating simulated blob in dev:', error);
   }
 
-  // Fallback simulated document blob
+  // Fallback simulated document blob for dev mode only
   const mockContent = `ClearUs Digital Infrastructure Limited\nDocument ID: ${assetId}\nFile: ${fileName}\nVerified: ${new Date().toISOString()}`;
   const blob = new Blob([mockContent], { type: 'application/pdf' });
   triggerBrowserDownload(blob, fileName);

@@ -1,5 +1,6 @@
 import { apiRequest, getBackendUrl } from './client';
 import { clientFetch } from './client-fetch';
+import { isDevMode } from '@/lib/mode';
 import type { UpdatePasswordPayload, UpdatePhotoPayload } from './types';
 
 export interface StudentProfile {
@@ -70,7 +71,10 @@ export async function clientUpdatePassword(
     });
     return { success: true, simulated: false };
   } catch (error) {
-    console.warn('[Users API Simulation Fallback] Password update fallback:', error);
+    if (!isDevMode()) {
+      throw error;
+    }
+    console.warn('[Users API Simulation Fallback] Password update fallback in dev:', error);
     return { success: true, simulated: true, message: 'Password updated (simulated)' };
   }
 }
@@ -88,7 +92,10 @@ export async function clientUpdatePhoto(
     });
     return { success: true, simulated: false };
   } catch (error) {
-    console.warn('[Users API Simulation Fallback] Photo update fallback:', error);
+    if (!isDevMode()) {
+      throw error;
+    }
+    console.warn('[Users API Simulation Fallback] Photo update fallback in dev:', error);
     return { success: true, simulated: true };
   }
 }

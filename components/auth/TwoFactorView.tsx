@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, RotateCw, ShieldCheck, AlertCircle, OctagonAlert } from 'lucide-react';
+import { ShieldCheck, AlertCircle, OctagonAlert } from 'lucide-react';
 import OtpInput from './OtpInput';
 
 interface TwoFactorViewProps {

@@ -14,7 +14,7 @@ type Step = 'enter-email' | 'email-sent' | 'link-expired' | 'verify-and-reset' |
 
 export default function ResetPasswordView({
   initialEmail,
-  institutionCode,
+  institutionCode: _institutionCode,
   onBack,
 }: ResetPasswordViewProps) {
   const [step, setStep] = useState<Step>('enter-email');
