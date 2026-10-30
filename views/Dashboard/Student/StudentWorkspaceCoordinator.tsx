@@ -7,6 +7,7 @@ import HeaderBar from '@/components/dashboard/student/HeaderBar';
 import OverviewContent from '@/components/dashboard/student/OverviewContent';
 import MyClearancesContent from '@/components/dashboard/student/MyClearancesContent';
 import ClearanceDetailContent from '@/components/dashboard/student/ClearanceDetailContent';
+import ClearanceStepDetailContent from '@/components/dashboard/student/ClearanceStepDetailContent';
 import DocumentVaultContent from '@/components/dashboard/student/DocumentVaultContent';
 import TimelineContent from '@/components/dashboard/student/TimelineContent';
 import NotificationsContent from '@/components/dashboard/student/NotificationsContent';
@@ -24,23 +25,45 @@ export default function StudentWorkspaceCoordinator({ institution, user }: Stude
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedClearanceId, setSelectedClearanceId] = useState<string | null>(null);
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
   const [uploadModalContext, setUploadModalContext] = useState<UploadContext | null>(null);
   const [unreadCount, setUnreadCount] = useState(2);
 
-  const handleSelectClearance = (clearanceId: string) => {
+  const handleSelectClearance = (clearanceId: string, stepId?: string) => {
     setSelectedClearanceId(clearanceId);
+    setSelectedStepId(stepId || null);
     setActiveSection('clearances');
   };
 
   const renderContent = () => {
     switch (activeSection) {
       case 'clearances':
+        if (selectedClearanceId && selectedStepId) {
+          return (
+            <ClearanceStepDetailContent
+              user={user}
+              clearanceId={selectedClearanceId}
+              stepId={selectedStepId}
+              onBackToClearance={() => setSelectedStepId(null)}
+              onBackToAllClearances={() => {
+                setSelectedStepId(null);
+                setSelectedClearanceId(null);
+              }}
+              onSelectStep={(stepId) => setSelectedStepId(stepId)}
+              onOpenUploadModal={(ctx) => setUploadModalContext(ctx)}
+            />
+          );
+        }
         if (selectedClearanceId) {
           return (
             <ClearanceDetailContent
               user={user}
               clearanceId={selectedClearanceId}
-              onBack={() => setSelectedClearanceId(null)}
+              onBack={() => {
+                setSelectedStepId(null);
+                setSelectedClearanceId(null);
+              }}
+              onSelectStep={(stepId) => setSelectedStepId(stepId)}
               onOpenUploadModal={(ctx) => setUploadModalContext(ctx)}
             />
           );
@@ -106,6 +129,7 @@ export default function StudentWorkspaceCoordinator({ institution, user }: Stude
         activeSection={activeSection}
         onNavigate={(section) => {
           setSelectedClearanceId(null);
+          setSelectedStepId(null);
           setActiveSection(section);
         }}
         collapsed={sidebarCollapsed}
@@ -117,6 +141,7 @@ export default function StudentWorkspaceCoordinator({ institution, user }: Stude
           institution={institution}
           onNavigate={(section) => {
             setSelectedClearanceId(null);
+            setSelectedStepId(null);
             setActiveSection(section);
           }}
           unreadCount={unreadCount}

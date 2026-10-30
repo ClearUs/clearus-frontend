@@ -6,7 +6,7 @@ export interface VaultDocument {
   sizeBytes: number;
   uploadedDate: string;
   clearanceCategory: string;
-  status: 'approved' | 'in_review';
+  status?: 'approved' | 'in_review';
   verifiedBy?: string;
   verifiedAt?: string;
   checksum?: string;
@@ -21,7 +21,6 @@ export const INITIAL_VAULT_DOCUMENTS: VaultDocument[] = [
     sizeBytes: 1258291,
     uploadedDate: '7 Oct 2026',
     clearanceCategory: 'Library Clearance',
-    status: 'approved',
     verifiedBy: 'Librarian Musa',
     verifiedAt: '8 Oct 2026, 10:15 AM',
     checksum: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
@@ -34,7 +33,6 @@ export const INITIAL_VAULT_DOCUMENTS: VaultDocument[] = [
     sizeBytes: 886784,
     uploadedDate: '13 Oct 2026',
     clearanceCategory: 'Department Clearance',
-    status: 'approved',
     verifiedBy: 'Head of Department',
     verifiedAt: '14 Oct 2026, 04:40 PM',
     checksum: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',

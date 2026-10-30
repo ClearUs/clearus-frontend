@@ -12,6 +12,7 @@ interface ClearanceDetailContentProps {
   user: User;
   clearanceId: string;
   onBack: () => void;
+  onSelectStep: (stepId: string) => void;
   onOpenUploadModal: (context: UploadContext) => void;
 }
 
@@ -76,6 +77,7 @@ export default function ClearanceDetailContent({
   user: _user,
   clearanceId,
   onBack,
+  onSelectStep,
   onOpenUploadModal,
 }: ClearanceDetailContentProps) {
   const [messageContext, setMessageContext] = useState<MessageOfficerContext | null>(null);
@@ -204,17 +206,13 @@ export default function ClearanceDetailContent({
                       <div>
                         <button
                           type="button"
-                          onClick={() =>
-                            onOpenUploadModal({
-                              clearanceTitle: clearance.title,
-                              stepTitle: step.name,
-                              stepId: step.id,
-                              docDescription: step.description,
-                            })
-                          }
-                          className="text-[14px] font-semibold text-[#15803D] underline underline-offset-2 hover:text-[#14532D] text-left cursor-pointer font-jakarta"
+                          onClick={() => onSelectStep(step.id)}
+                          className="text-[14px] font-semibold text-[#15803D] hover:underline underline-offset-2 hover:text-[#14532D] text-left cursor-pointer font-jakarta flex items-center gap-1.5"
                         >
-                          {step.name}
+                          <span>{step.name}</span>
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-[#15803D]">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
                         </button>
                         <p className="text-[12px] text-[#9CA3AF] mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
                           {step.description}

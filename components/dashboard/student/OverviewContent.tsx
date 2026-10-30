@@ -12,7 +12,7 @@ interface OverviewContentProps {
     stepTitle: string;
     docDescription?: string;
   }) => void;
-  onSelectClearance?: (clearanceId: string) => void;
+  onSelectClearance?: (clearanceId: string, stepId?: string) => void;
 }
 
 interface ClearanceStep {
@@ -24,33 +24,36 @@ interface ClearanceStep {
   status: 'approved' | 'action_required' | 'locked';
   stepsCompleted: number;
   stepsTotal: number;
-  documents?: { name: string; description: string }[];
+  documents?: { id?: string; name: string; description: string }[];
   unlockMessage?: string;
 }
 
 const MOCK_CLEARANCES: ClearanceStep[] = [
   {
-    id: '1',
+    id: 'library',
     number: 1,
     title: 'Library Clearance',
     department: 'University Library Services',
     officer: 'Librarian Musa',
     status: 'approved',
-    stepsCompleted: 2,
-    stepsTotal: 2,
+    stepsCompleted: 1,
+    stepsTotal: 1,
   },
   {
-    id: '2',
+    id: 'department',
     number: 2,
     title: 'Department Clearance',
     department: 'Computer Science',
     officer: 'Head of Department',
-    status: 'approved',
-    stepsCompleted: 2,
+    status: 'action_required',
+    stepsCompleted: 1,
     stepsTotal: 2,
+    documents: [
+      { id: 'dept-handover', name: 'Upload departmental handover form', description: 'Signed handover form · Returned' },
+    ],
   },
   {
-    id: '3',
+    id: 'bursary',
     number: 3,
     title: 'Bursary Clearance',
     department: 'Bursary & Student Accounts',
@@ -59,12 +62,12 @@ const MOCK_CLEARANCES: ClearanceStep[] = [
     stepsCompleted: 0,
     stepsTotal: 2,
     documents: [
-      { name: 'Upload faculty dues receipt', description: 'Payment receipt · PDF, JPG or PNG' },
-      { name: 'Upload convocation fee receipt', description: 'Payment receipt · PDF, JPG or PNG' },
+      { id: 'faculty-dues', name: 'Upload faculty dues receipt', description: 'Payment receipt · PDF, JPG or PNG' },
+      { id: 'convocation-fee', name: 'Upload convocation fee receipt', description: 'Payment receipt · PDF, JPG or PNG' },
     ],
   },
   {
-    id: '4',
+    id: 'student-affairs',
     number: 4,
     title: 'Student Affairs Clearance',
     department: 'Student Affairs Division',
@@ -222,7 +225,7 @@ function StatusBadge({ status }: { status: ClearanceStep['status'] }) {
 
 interface ClearanceCardProps {
   clearance: ClearanceStep;
-  onSelectClearance?: (clearanceId: string) => void;
+  onSelectClearance?: (clearanceId: string, stepId?: string) => void;
   onOpenUploadModal?: (context: {
     clearanceTitle: string;
     stepTitle: string;
@@ -300,17 +303,24 @@ function ClearanceCard({ clearance, onSelectClearance, onOpenUploadModal }: Clea
                 <div>
                   <button
                     type="button"
-                    onClick={() =>
-                      onOpenUploadModal?.({
-                        clearanceTitle: clearance.title,
-                        stepTitle: doc.name,
-                        docDescription: doc.description,
-                      })
-                    }
-                    className="text-[13px] font-medium text-[#15803D] underline underline-offset-2 hover:text-[#14532D] text-left cursor-pointer"
+                    onClick={() => {
+                      if (onSelectClearance) {
+                        onSelectClearance(clearance.id, doc.id);
+                      } else {
+                        onOpenUploadModal?.({
+                          clearanceTitle: clearance.title,
+                          stepTitle: doc.name,
+                          docDescription: doc.description,
+                        });
+                      }
+                    }}
+                    className="text-[13px] font-medium text-[#15803D] hover:underline underline-offset-2 hover:text-[#14532D] text-left cursor-pointer flex items-center gap-1"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    {doc.name}
+                    <span>{doc.name}</span>
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </button>
                   <p className="text-[12px] text-[#9CA3AF]" style={{ fontFamily: 'Inter, sans-serif' }}>
                     {doc.description}
@@ -439,8 +449,8 @@ export default function OverviewContent({
               <ClearanceCard
                 key={clearance.id}
                 clearance={clearance}
-                onSelectClearance={(id) => {
-                  if (onSelectClearance) onSelectClearance(id);
+                onSelectClearance={(id, stepId) => {
+                  if (onSelectClearance) onSelectClearance(id, stepId);
                   else if (onNavigate) onNavigate('clearances');
                 }}
                 onOpenUploadModal={onOpenUploadModal}
