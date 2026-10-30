@@ -20,7 +20,9 @@ export const INSTITUTIONS: Institution[] = [
     allowedDomains: ['futo.edu.ng', 'gmail.com'],
     departments: [
       'Computer Engineering',
-      'School of Engineering and Engineering Technology',
+      'Civil Engineering',
+      'Electrical & Electronic Engineering',
+      'Mechanical Engineering',
     ],
     stats: {
       totalStudents: 18450,
