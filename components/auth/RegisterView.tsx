@@ -20,8 +20,10 @@ import OtpInput from './OtpInput';
 import { getInstitutionByCode } from '@/data/institution';
 
 interface PortalRecord {
-  id?: string;
+  id?: string | number;
   code?: string;
+  code_name?: string;
+  schema_name?: string;
   subdomain?: string;
   slug?: string;
   name?: string;
@@ -29,7 +31,7 @@ interface PortalRecord {
   allowed_domains?: string[];
   allowedDomains?: string[];
   email_domains?: string[];
-  domains?: string[];
+  domains?: (string | { id?: number; domain?: string; is_primary?: boolean })[];
 }
 
 interface UnitRecord {
@@ -163,11 +165,28 @@ export default function RegisterView({
           : [];
 
         const matched = list.find((p: PortalRecord) => {
-          const code = (p.code || p.subdomain || p.slug || p.id || '').toLowerCase();
-          const name = (p.name || '').toLowerCase();
+          const codeName = String(p.code_name || '').toLowerCase();
+          const schemaName = String(p.schema_name || '').replace(/_schema$/, '').toLowerCase();
+          const code = String(p.code || p.subdomain || p.slug || '').toLowerCase();
+          const idStr = String(p.id ?? '').toLowerCase();
+          const name = String(p.name || '').toLowerCase();
           const targetCode = institutionCode.toLowerCase();
           const targetName = institutionName.toLowerCase();
-          return code === targetCode || name.includes(targetName) || targetName.includes(name);
+
+          return (
+            codeName === targetCode ||
+            schemaName === targetCode ||
+            code === targetCode ||
+            idStr === targetCode ||
+            name === targetName ||
+            name.includes(targetName) ||
+            targetName.includes(name) ||
+            (Array.isArray(p.domains) &&
+              p.domains.some((d) => {
+                const domainStr = typeof d === 'string' ? d : d?.domain || '';
+                return domainStr.toLowerCase().includes(targetCode);
+              }))
+          );
         });
 
         if (matched) {
@@ -175,12 +194,15 @@ export default function RegisterView({
             matched.allowed_email_domains ||
             matched.allowed_domains ||
             matched.allowedDomains ||
-            matched.email_domains ||
-            matched.domains;
+            matched.email_domains;
 
           if (Array.isArray(rawDomains) && rawDomains.length > 0) {
-            const cleaned = rawDomains.map((d: string) => String(d).toLowerCase().trim().replace(/^@/, ''));
-            setAllowedDomains(cleaned);
+            const cleaned = rawDomains
+              .map((d: unknown) => String(d || '').toLowerCase().trim().replace(/^@/, ''))
+              .filter(Boolean);
+            if (cleaned.length > 0) {
+              setAllowedDomains(cleaned);
+            }
           }
         }
       })

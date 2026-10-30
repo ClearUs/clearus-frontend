@@ -116,7 +116,13 @@ export default function BrandedLogin({ institution }: BrandedLoginProps) {
       </div>
       <button
         type="button"
-        onClick={() => router.push('/auth')}
+        onClick={() => {
+          if (appDomain) {
+            window.location.href = `https://${appDomain}/auth`;
+          } else {
+            router.push('/auth');
+          }
+        }}
         className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
