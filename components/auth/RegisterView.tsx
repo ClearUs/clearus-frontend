@@ -14,10 +14,10 @@ import {
   GraduationCap,
   UserX,
   MailX,
-  ChevronDown,
 } from 'lucide-react';
 import OtpInput from './OtpInput';
 import { getInstitutionByCode } from '@/data/institution';
+import CustomSelect from '@/components/shared/CustomSelect';
 
 interface PortalRecord {
   id?: string | number;
@@ -108,23 +108,23 @@ export default function RegisterView({
   const [email, setEmail] = useState('');
   const [matric, setMatric] = useState('');
   const [digits, setDigits] = useState<string[]>(Array(6).fill(''));
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [department, setDepartment] = useState('');
   const [level, setLevel] = useState('');
 
   // Fallbacks from local institution data
   const localInst = getInstitutionByCode(institutionCode);
-  const defaultAllowed = localInst?.allowedDomains || ['futo.edu.ng', 'student.futo.edu.ng'];
+  const defaultAllowed = localInst?.allowedDomains || ['futo.edu.ng', 'gmail.com'];
   const [allowedDomains, setAllowedDomains] = useState<string[]>(defaultAllowed);
 
   const defaultUnits = (localInst?.departments || [
-    'Computer Science',
-    'Electrical & Electronic Engineering',
-    'Mechanical Engineering',
-    'Information Technology',
-    'Biotechnology',
-    'Cyber Security',
-  ]).map((d, idx) => ({ id: `unit_${idx + 1}`, name: d }));
+    'Computer Engineering',
+    'School of Engineering and Engineering Technology',
+  ]).map((d, idx) => ({
+    id: idx === 0 ? 'fbf61b10-1ff4-4ca5-8be8-6e05d19a7699' : idx === 1 ? '45dc4520-e4e5-4aa0-84f6-f943e7e4ef00' : `unit_${idx + 1}`,
+    name: d,
+  }));
 
   const defaultLevels = [
     '100 Level',
@@ -212,7 +212,10 @@ export default function RegisterView({
 
     // 2. Fetch Registration Units & Levels
     fetch('/api/proxy/api/v1/iam/students/registration/units/', {
-      headers: { 'x-tenant': institutionCode },
+      headers: {
+        'x-tenant': institutionCode.toLowerCase(),
+        Accept: 'application/json',
+      },
     })
       .then((res) => (res.ok ? (res.json() as Promise<RegistrationDataPayload | UnitRecord[]>) : null))
       .then((data) => {
@@ -408,8 +411,13 @@ export default function RegisterView({
     e.preventDefault();
     setErrorMsg('');
 
-    if (!fullName.trim()) {
-      setErrorMsg('Please enter your full name.');
+    if (!firstName.trim()) {
+      setErrorMsg('Please enter your first name.');
+      return;
+    }
+
+    if (!lastName.trim()) {
+      setErrorMsg('Please enter your last name.');
       return;
     }
 
@@ -454,7 +462,9 @@ export default function RegisterView({
         body: JSON.stringify({
           email: email.trim(),
           matric: matric.trim() || undefined,
-          full_name: fullName.trim(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          full_name: `${firstName.trim()} ${lastName.trim()}`.trim(),
           department: department || availableUnits.find(u => u.id === selectedUnitId)?.name || 'General',
           academic_unit_id: selectedUnitId || availableUnits[0]?.id || undefined,
           level: String(level).replace(/\D/g, '') || '100',
@@ -543,7 +553,7 @@ export default function RegisterView({
             Your account is ready
           </h1>
           <p className="text-gray-500 text-sm mb-4">
-            Welcome to ClearUs, {fullName.split(' ')[0]}. You can now start your clearance journey.
+            Welcome to ClearUs, {firstName || 'Student'}. You can now start your clearance journey.
           </p>
           <p className="text-xs text-gray-400 mb-8 flex items-center justify-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
@@ -730,46 +740,51 @@ export default function RegisterView({
             </p>
 
             <form onSubmit={handleDetailsSubmit} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">Full name</label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={e => setFullName(e.target.value)}
-                    placeholder="Chikaobi Emmanuel"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
-                    required
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">First name</label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={e => setFirstName(e.target.value)}
+                      placeholder="Chikaobi"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">Last name</label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={e => setLastName(e.target.value)}
+                      placeholder="Emmanuel"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700">Academic unit / department</label>
-                <div className="relative">
-                  <select
-                    value={selectedUnitId}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setSelectedUnitId(val);
-                      const unit = availableUnits.find(u => u.id === val);
-                      if (unit) setDepartment(unit.name);
-                    }}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer appearance-none"
-                    required
-                  >
-                    <option value="" disabled>Select your academic unit / department</option>
-                    {availableUnits.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
-                </div>
+                <CustomSelect
+                  options={availableUnits.map((u) => ({ value: u.id, label: u.name }))}
+                  value={selectedUnitId}
+                  onChange={(val) => {
+                    setSelectedUnitId(val);
+                    const unit = availableUnits.find((u) => u.id === val);
+                    if (unit) setDepartment(unit.name);
+                    if (errorMsg) setErrorMsg('');
+                  }}
+                  placeholder="Select your academic unit / department"
+                />
               </div>
 
               {method === 'matric' && (
@@ -784,7 +799,7 @@ export default function RegisterView({
                         setEmail(e.target.value);
                         if (errorMsg) setErrorMsg('');
                       }}
-                      placeholder={`you@${allowedDomains[0]?.replace(/^@/, '') || 'student.futo.edu.ng'}`}
+                      placeholder={`you@${allowedDomains[0]?.replace(/^@/, '') || 'futo.edu.ng'}`}
                       className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
                       required
                     />
@@ -802,24 +817,15 @@ export default function RegisterView({
 
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700">Level</label>
-                <div className="relative">
-                  <select
-                    value={level}
-                    onChange={e => setLevel(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer appearance-none"
-                    required
-                  >
-                    <option value="" disabled>Select your level</option>
-                    {availableLevels.map((lvl) => (
-                      <option key={lvl} value={lvl}>
-                        {lvl}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
-                </div>
+                <CustomSelect
+                  options={availableLevels.map((lvl) => ({ value: lvl, label: lvl }))}
+                  value={level}
+                  onChange={(val) => {
+                    setLevel(val);
+                    if (errorMsg) setErrorMsg('');
+                  }}
+                  placeholder="Select your level"
+                />
               </div>
 
               {errorMsg && (

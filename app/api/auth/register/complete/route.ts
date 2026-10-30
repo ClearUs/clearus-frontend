@@ -1,9 +1,12 @@
 import { getBackendUrl } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 import { isDevMode } from '@/lib/mode';
 
 interface RegisterCompleteBody {
   email?: string;
   matric?: string;
+  first_name?: string;
+  last_name?: string;
   full_name?: string;
   department?: string;
   academic_unit_id?: string;
@@ -24,6 +27,8 @@ export async function POST(request: Request) {
   const {
     email,
     matric,
+    first_name,
+    last_name,
     full_name,
     department,
     academic_unit_id,
@@ -46,9 +51,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const nameParts = (full_name || '').trim().split(/\s+/);
-  const firstName = nameParts[0] || 'Student';
-  const lastName = nameParts.slice(1).join(' ') || 'User';
+  let firstName = (first_name || '').trim();
+  let lastName = (last_name || '').trim();
+
+  if (!firstName || !lastName) {
+    const nameParts = (full_name || '').trim().split(/\s+/);
+    firstName = firstName || nameParts[0] || 'Student';
+    lastName = lastName || nameParts.slice(1).join(' ') || 'User';
+  }
 
   const payload = {
     email: email || `${matric}@student.${institution || 'clearus'}.edu.ng`,
@@ -61,12 +71,15 @@ export async function POST(request: Request) {
   };
 
   try {
-    const backend = getBackendUrl(institution);
+    const hostTenant = getTenantFromHost(request.headers.get('host'));
+    const targetTenant = (institution || hostTenant || 'futo').toLowerCase().trim();
+    const backend = getBackendUrl(targetTenant);
     const upstream = await fetch(`${backend}/api/v1/iam/students/register/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        'x-tenant': targetTenant,
       },
       body: JSON.stringify(payload),
     });

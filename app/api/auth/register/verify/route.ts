@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { getBackendUrl } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 import { isDevMode } from '@/lib/mode';
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
@@ -51,12 +52,15 @@ export async function POST(request: Request) {
 
   // Live upstream call: POST /api/v1/core/auth/verify-email/
   try {
-    const backend = getBackendUrl(tenant);
+    const hostTenant = getTenantFromHost(request.headers.get('host'));
+    const targetTenant = (tenant || hostTenant || 'futo').toLowerCase().trim();
+    const backend = getBackendUrl(targetTenant);
     const upstream = await fetch(`${backend}/api/v1/core/auth/verify-email/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        'x-tenant': targetTenant,
       },
       body: JSON.stringify({ email, code }),
     });

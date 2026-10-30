@@ -17,14 +17,10 @@ export const INSTITUTIONS: Institution[] = [
       bannerGradient: 'from-slate-950 via-neutral-950 to-green-950',
       lightAccentBg: 'bg-green-950/20 text-green-400 border-green-500/20',
     },
-    allowedDomains: ['futo.edu.ng', 'student.futo.edu.ng', 'gmail.com'],
+    allowedDomains: ['futo.edu.ng', 'gmail.com'],
     departments: [
-      'Computer Science',
-      'Electrical & Electronic Engineering',
-      'Mechanical Engineering',
-      'Information Technology',
-      'Biotechnology',
-      'Cyber Security'
+      'Computer Engineering',
+      'School of Engineering and Engineering Technology',
     ],
     stats: {
       totalStudents: 18450,
