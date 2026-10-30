@@ -4,20 +4,26 @@ import { isDevMode } from '@/lib/mode';
 import type { UpdatePasswordPayload, UpdatePhotoPayload } from './types';
 
 export interface StudentProfile {
-  id: string;
+  id?: string;
   matric_number: string;
   level: number;
-  academic_unit?: {
-    id: string;
-    name: string;
-    code_name?: string;
-    unit_type?: string;
-  };
+  academic_unit?:
+    | string
+    | {
+        id: string;
+        name: string;
+        code_name?: string;
+        unit_type?: string;
+      }
+    | null;
+  affiliated_units?: string[];
   user: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
+    id?: string;
+    username?: string;
+    email?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    profile_picture?: string | null;
     photo_url?: string;
   };
 }

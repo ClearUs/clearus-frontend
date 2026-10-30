@@ -3,10 +3,18 @@ import { apiRequest } from './client';
 export interface ClientPortal {
   id: string;
   name: string;
+  code?: string;
+  slug?: string;
   subdomain?: string;
   domain?: string;
+  allowed_domains?: string[];
+  allowed_email_domains?: string[];
+  allowedDomains?: string[];
+  email_domains?: string[];
+  domains?: string[];
   logo_url?: string;
   is_active?: boolean;
+  [key: string]: unknown;
 }
 
 /**

@@ -1,14 +1,15 @@
-// TODO: Wire to backend registration check endpoint when available
-// Placeholder: validates input shape and returns success so the UI flow can be tested
+import { getInstitutionByCode } from '@/data/institution';
 
 export async function POST(request: Request) {
   let identifier: string;
   let method: string;
+  let institution: string | undefined;
 
   try {
     const body = await request.json();
     identifier = body.identifier;
     method = body.method;
+    institution = body.institution;
   } catch {
     return Response.json({ detail: 'Invalid request body.' }, { status: 400 });
   }
@@ -18,6 +19,30 @@ export async function POST(request: Request) {
       { detail: 'Identifier and method are required.' },
       { status: 400 },
     );
+  }
+
+  // Server-side email domain validation safeguard
+  if (method === 'school-email' && identifier.includes('@')) {
+    const domain = identifier.split('@')[1]?.toLowerCase().trim();
+    if (institution) {
+      const inst = getInstitutionByCode(institution);
+      if (inst && inst.allowedDomains && inst.allowedDomains.length > 0) {
+        const isAllowed = inst.allowedDomains.some((d) => {
+          const norm = d.toLowerCase().trim().replace(/^@/, '');
+          return domain === norm || domain.endsWith('.' + norm);
+        });
+        if (!isAllowed) {
+          const allowedList = inst.allowedDomains.map((d) => `@${d.replace(/^@/, '')}`).join(', ');
+          return Response.json(
+            {
+              code: 'not_school_email',
+              detail: `Email domain @${domain} is not permitted for ${inst.name}. Accepted domains: ${allowedList}`,
+            },
+            { status: 400 },
+          );
+        }
+      }
+    }
   }
 
   // Placeholder validation: simulate error states for testing via DevAuthNav

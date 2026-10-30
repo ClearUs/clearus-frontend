@@ -5,9 +5,13 @@ import { isDevMode } from '@/lib/mode';
 
 export interface UploadAssetResponse {
   id: string;
+  original_filename?: string;
   name?: string;
+  size_bytes?: number;
   size?: number;
+  mime_type?: string;
   content_type?: string;
+  created_at?: string;
   simulated?: boolean;
 }
 

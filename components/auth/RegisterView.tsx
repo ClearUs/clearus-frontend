@@ -17,6 +17,35 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import OtpInput from './OtpInput';
+import { getInstitutionByCode } from '@/data/institution';
+
+interface PortalRecord {
+  id?: string;
+  code?: string;
+  subdomain?: string;
+  slug?: string;
+  name?: string;
+  allowed_email_domains?: string[];
+  allowed_domains?: string[];
+  allowedDomains?: string[];
+  email_domains?: string[];
+  domains?: string[];
+}
+
+interface UnitRecord {
+  id?: string | number;
+  pk?: string | number;
+  name?: string;
+  code_name?: string;
+  levels?: (string | number)[];
+}
+
+interface RegistrationDataPayload {
+  units?: UnitRecord[];
+  academic_units?: UnitRecord[];
+  results?: UnitRecord[];
+  levels?: (string | number | { name?: string; label?: string; value?: string | number })[];
+}
 
 interface RegisterViewProps {
   institutionCode: string;
@@ -80,8 +109,34 @@ export default function RegisterView({
   const [fullName, setFullName] = useState('');
   const [department, setDepartment] = useState('');
   const [level, setLevel] = useState('');
-  const [availableUnits, setAvailableUnits] = useState<{ id: string; name: string }[]>([]);
+
+  // Fallbacks from local institution data
+  const localInst = getInstitutionByCode(institutionCode);
+  const defaultAllowed = localInst?.allowedDomains || ['futo.edu.ng', 'student.futo.edu.ng'];
+  const [allowedDomains, setAllowedDomains] = useState<string[]>(defaultAllowed);
+
+  const defaultUnits = (localInst?.departments || [
+    'Computer Science',
+    'Electrical & Electronic Engineering',
+    'Mechanical Engineering',
+    'Information Technology',
+    'Biotechnology',
+    'Cyber Security',
+  ]).map((d, idx) => ({ id: `unit_${idx + 1}`, name: d }));
+
+  const defaultLevels = [
+    '100 Level',
+    '200 Level',
+    '300 Level',
+    '400 Level',
+    '500 Level',
+    '600 Level',
+  ];
+
+  const [availableUnits, setAvailableUnits] = useState<{ id: string; name: string }[]>(defaultUnits);
+  const [availableLevels, setAvailableLevels] = useState<string[]>(defaultLevels);
   const [selectedUnitId, setSelectedUnitId] = useState<string>('');
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -94,19 +149,107 @@ export default function RegisterView({
   const steps = method === 'school-email' ? STEPS_EMAIL : STEPS_MATRIC;
 
   useEffect(() => {
-    fetch('/api/proxy/api/v1/iam/students/registration/units/')
-      .then(res => (res.ok ? res.json() : []))
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setAvailableUnits(data);
-          if (data[0]?.id) {
-            setSelectedUnitId(data[0].id);
-            setDepartment(data[0].name);
+    // 1. Fetch Client Portals (Navigation) to get authorized email domains
+    fetch('/api/proxy/api/v1/customers/portals/')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const list: PortalRecord[] = Array.isArray(data)
+          ? (data as PortalRecord[])
+          : Array.isArray((data as { results?: PortalRecord[] }).results)
+          ? ((data as { results: PortalRecord[] }).results)
+          : Array.isArray((data as { portals?: PortalRecord[] }).portals)
+          ? ((data as { portals: PortalRecord[] }).portals)
+          : [];
+
+        const matched = list.find((p: PortalRecord) => {
+          const code = (p.code || p.subdomain || p.slug || p.id || '').toLowerCase();
+          const name = (p.name || '').toLowerCase();
+          const targetCode = institutionCode.toLowerCase();
+          const targetName = institutionName.toLowerCase();
+          return code === targetCode || name.includes(targetName) || targetName.includes(name);
+        });
+
+        if (matched) {
+          const rawDomains =
+            matched.allowed_email_domains ||
+            matched.allowed_domains ||
+            matched.allowedDomains ||
+            matched.email_domains ||
+            matched.domains;
+
+          if (Array.isArray(rawDomains) && rawDomains.length > 0) {
+            const cleaned = rawDomains.map((d: string) => String(d).toLowerCase().trim().replace(/^@/, ''));
+            setAllowedDomains(cleaned);
           }
         }
       })
-      .catch(() => {});
-  }, []);
+      .catch((err) => {
+        console.warn('[RegisterView] Failed to fetch portal allowed domains, using defaults:', err);
+      });
+
+    // 2. Fetch Registration Units & Levels
+    fetch('/api/proxy/api/v1/iam/students/registration/units/', {
+      headers: { 'x-tenant': institutionCode },
+    })
+      .then((res) => (res.ok ? (res.json() as Promise<RegistrationDataPayload | UnitRecord[]>) : null))
+      .then((data) => {
+        if (!data) return;
+
+        // Extract units
+        let unitsList: UnitRecord[] = [];
+        if (Array.isArray(data)) {
+          unitsList = data;
+        } else if (Array.isArray(data.units)) {
+          unitsList = data.units;
+        } else if (Array.isArray(data.academic_units)) {
+          unitsList = data.academic_units;
+        } else if (Array.isArray(data.results)) {
+          unitsList = data.results;
+        }
+
+        if (unitsList.length > 0) {
+          const mapped = unitsList.map((u: UnitRecord) => ({
+            id: String(u.id || u.pk || u.code_name || u.name),
+            name: String(u.name || u.code_name || 'Academic Unit'),
+          }));
+          setAvailableUnits(mapped);
+          if (mapped[0]?.id && !selectedUnitId) {
+            setSelectedUnitId(mapped[0].id);
+            setDepartment(mapped[0].name);
+          }
+        }
+
+        // Extract levels
+        let levelsList: (string | number | { name?: string; label?: string; value?: string | number })[] = [];
+        if (!Array.isArray(data) && Array.isArray(data.levels)) {
+          levelsList = data.levels;
+        } else if (unitsList.length > 0) {
+          const extracted = new Set<string>();
+          unitsList.forEach((u: UnitRecord) => {
+            if (Array.isArray(u.levels)) {
+              u.levels.forEach((l) => extracted.add(typeof l === 'number' ? `${l} Level` : String(l)));
+            }
+          });
+          if (extracted.size > 0) levelsList = Array.from(extracted);
+        }
+
+        if (levelsList.length > 0) {
+          const formatted = levelsList.map((l) => {
+            if (typeof l === 'object' && l !== null) {
+              return String(l.name || l.label || l.value);
+            }
+            const str = String(l);
+            return str.toLowerCase().includes('level') ? str : `${str} Level`;
+          });
+          formatted.sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+          setAvailableLevels(formatted);
+        }
+      })
+      .catch((err) => {
+        console.warn('[RegisterView] Failed to load registration units, using defaults:', err);
+      });
+  }, [institutionCode, institutionName, selectedUnitId]);
 
   useEffect(() => {
     if (step !== 'verify-email' || verifyCountdown <= 0) return;
@@ -124,6 +267,7 @@ export default function RegisterView({
   };
 
   const goPrev = () => {
+    setErrorMsg('');
     if (step === 'details') {
       setStep(method === 'school-email' ? 'enter-id' : 'verify-student');
     } else if (step === 'verify-student') {
@@ -137,9 +281,52 @@ export default function RegisterView({
     }
   };
 
+  /**
+   * Client-side email validation against portal-allowed domains.
+   * Runs before contacting the server to prevent unnecessary server requests.
+   */
+  const validateEmailDomain = (inputEmail: string): { valid: boolean; error?: string } => {
+    const trimmed = inputEmail.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) {
+      return { valid: false, error: 'Please enter a valid email address.' };
+    }
+
+    const domain = trimmed.split('@')[1];
+    const isAllowed = allowedDomains.some((d) => {
+      const norm = d.toLowerCase().trim().replace(/^@/, '');
+      return domain === norm || domain.endsWith('.' + norm);
+    });
+
+    if (!isAllowed) {
+      const allowedFormatted = allowedDomains.map((d) => `@${d.replace(/^@/, '')}`).join(', ');
+      return {
+        valid: false,
+        error: `Only authorized email addresses (${allowedFormatted}) are allowed for ${institutionName}. "@${domain}" is not permitted.`,
+      };
+    }
+
+    return { valid: true };
+  };
+
   const handleEnterIdSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    // Client-side validation: reject invalid email domains before contacting server
+    if (method === 'school-email') {
+      const check = validateEmailDomain(email);
+      if (!check.valid) {
+        setErrorMsg(check.error || 'Please enter an authorized school email address.');
+        return;
+      }
+    } else {
+      if (!matric.trim()) {
+        setErrorMsg('Please enter your matric number.');
+        return;
+      }
+    }
+
     setIsLoading(true);
     try {
       const identifier = method === 'school-email' ? email.trim() : matric.trim();
@@ -198,10 +385,31 @@ export default function RegisterView({
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!fullName.trim()) {
+      setErrorMsg('Please enter your full name.');
+      return;
+    }
+
+    // If registered via matric number, validate the provided contact email
+    if (method === 'matric') {
+      const check = validateEmailDomain(email);
+      if (!check.valid) {
+        setErrorMsg(check.error || 'Please enter an authorized school email address.');
+        return;
+      }
+    }
+
+    if (!selectedUnitId) {
+      setErrorMsg('Please select your academic unit / department.');
+      return;
+    }
+
     if (!level) {
       setErrorMsg('Please select your level.');
       return;
     }
+
     setStep('password');
   };
 
@@ -225,8 +433,8 @@ export default function RegisterView({
           email: email.trim(),
           matric: matric.trim() || undefined,
           full_name: fullName.trim(),
-          department: department.trim(),
-          academic_unit_id: selectedUnitId || undefined,
+          department: department || availableUnits.find(u => u.id === selectedUnitId)?.name || 'General',
+          academic_unit_id: selectedUnitId || availableUnits[0]?.id || undefined,
           level: String(level).replace(/\D/g, '') || '100',
           password,
           institution: institutionCode,
@@ -280,7 +488,7 @@ export default function RegisterView({
   const errScreen = errorScreens[step];
   if (errScreen) {
     return (
-      <div className="w-full max-w-[625px]">
+      <div className="w-full max-w-156.25">
         <div className="bg-white rounded-[25px] p-10 md:px-20 md:py-16 shadow-sm border border-gray-100 text-center">
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
             {errScreen.icon}
@@ -304,7 +512,7 @@ export default function RegisterView({
 
   if (step === 'complete') {
     return (
-      <div className="w-full max-w-[625px]">
+      <div className="w-full max-w-156.25">
         <div className="bg-white rounded-[25px] p-10 md:px-20 md:py-16 shadow-sm border border-gray-100 text-center">
           <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
             <CheckCircle2 className="w-7 h-7 text-green-700" />
@@ -332,7 +540,7 @@ export default function RegisterView({
   }
 
   return (
-    <div className="w-full max-w-[625px]">
+    <div className="w-full max-w-156.25">
       <div className="bg-white rounded-[25px] p-10 md:px-20 md:py-16 shadow-sm border border-gray-100">
         <button
           type="button"
@@ -392,12 +600,31 @@ export default function RegisterView({
                   <input
                     type={method === 'school-email' ? 'email' : 'text'}
                     value={method === 'school-email' ? email : matric}
-                    onChange={e => method === 'school-email' ? setEmail(e.target.value) : setMatric(e.target.value)}
-                    placeholder={method === 'school-email' ? 'you@futo.edu.ng' : 'e.g. 2021/104928'}
+                    onChange={(e) => {
+                      if (method === 'school-email') {
+                        setEmail(e.target.value);
+                      } else {
+                        setMatric(e.target.value);
+                      }
+                      if (errorMsg) setErrorMsg('');
+                    }}
+                    placeholder={
+                      method === 'school-email'
+                        ? `you@${allowedDomains[0]?.replace(/^@/, '') || 'futo.edu.ng'}`
+                        : 'e.g. 2021/104928'
+                    }
                     className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
                     required
                   />
                 </div>
+                {method === 'school-email' && allowedDomains.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                    <span className="text-gray-400">Authorized domains:</span>{' '}
+                    <span className="font-medium text-green-700 font-mono text-[11px]">
+                      {allowedDomains.map((d) => `@${d.replace(/^@/, '')}`).join(', ')}
+                    </span>
+                  </p>
+                )}
               </div>
 
               <p className="text-xs text-gray-400 flex items-start gap-1.5">
@@ -497,35 +724,30 @@ export default function RegisterView({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">Academic Unit / Department</label>
-                {availableUnits.length > 0 ? (
+                <label className="block text-sm font-medium text-gray-700">Academic unit / department</label>
+                <div className="relative">
                   <select
                     value={selectedUnitId}
                     onChange={(e) => {
-                      setSelectedUnitId(e.target.value);
-                      const unit = availableUnits.find(u => u.id === e.target.value);
+                      const val = e.target.value;
+                      setSelectedUnitId(val);
+                      const unit = availableUnits.find(u => u.id === val);
                       if (unit) setDepartment(unit.name);
                     }}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all cursor-pointer appearance-none"
                     required
                   >
-                    <option value="">Select your department / unit</option>
+                    <option value="" disabled>Select your academic unit / department</option>
                     {availableUnits.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.name}
                       </option>
                     ))}
                   </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={department}
-                    onChange={e => setDepartment(e.target.value)}
-                    placeholder="Computer Science"
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
-                    required
-                  />
-                )}
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {method === 'matric' && (
@@ -536,13 +758,23 @@ export default function RegisterView({
                     <input
                       type="email"
                       value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="you@student.futo.edu.ng"
+                      onChange={e => {
+                        setEmail(e.target.value);
+                        if (errorMsg) setErrorMsg('');
+                      }}
+                      placeholder={`you@${allowedDomains[0]?.replace(/^@/, '') || 'student.futo.edu.ng'}`}
                       className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
                       required
                     />
                   </div>
-                  <p className="text-xs text-gray-400">Your verification OTP code will be sent to this email.</p>
+                  <p className="text-xs text-gray-400">
+                    Your verification OTP code will be sent to this email.
+                    {allowedDomains.length > 0 && (
+                      <span className="block mt-0.5 text-green-700 font-mono text-[11px]">
+                        Accepted: {allowedDomains.map((d) => `@${d.replace(/^@/, '')}`).join(', ')}
+                      </span>
+                    )}
+                  </p>
                 </div>
               )}
 
@@ -556,12 +788,11 @@ export default function RegisterView({
                     required
                   >
                     <option value="" disabled>Select your level</option>
-                    <option value="100 Level">100 Level</option>
-                    <option value="200 Level">200 Level</option>
-                    <option value="300 Level">300 Level</option>
-                    <option value="400 Level">400 Level</option>
-                    <option value="500 Level">500 Level</option>
-                    <option value="600 Level">600 Level</option>
+                    {availableLevels.map((lvl) => (
+                      <option key={lvl} value={lvl}>
+                        {lvl}
+                      </option>
+                    ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
                     <ChevronDown className="w-4 h-4" />

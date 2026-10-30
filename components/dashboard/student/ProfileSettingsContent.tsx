@@ -207,7 +207,7 @@ export default function ProfileSettingsContent({
                   Department
                 </span>
                 <span className="text-[14px] font-medium text-[#13241A] font-jakarta">
-                  {profile?.academic_unit?.name || user.department || 'Computer Science'}
+                  {(typeof profile?.academic_unit === 'object' && profile?.academic_unit?.name) || user.department || 'Computer Science'}
                 </span>
               </div>
               <LockIcon />

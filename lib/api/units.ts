@@ -50,11 +50,27 @@ export interface RegisterStudentPayload {
   level: number;
 }
 
-export async function getRegistrationUnits(tenant?: string): Promise<UnitNode[]> {
-  return apiRequest<UnitNode[]>('/api/v1/iam/students/registration/units/', {
-    method: 'GET',
-    tenant,
-  });
+export interface StudentLevelOption {
+  value: number;
+  label: string;
+}
+
+export interface StudentRegistrationUnitsResponse {
+  academic_units: UnitNode[];
+  non_academic_units: UnitNode[];
+  levels: StudentLevelOption[];
+}
+
+export async function getRegistrationUnits(
+  tenant?: string,
+): Promise<StudentRegistrationUnitsResponse> {
+  return apiRequest<StudentRegistrationUnitsResponse>(
+    '/api/v1/iam/students/registration/units/',
+    {
+      method: 'GET',
+      tenant,
+    },
+  );
 }
 
 export async function registerStudent(
