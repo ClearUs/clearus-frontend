@@ -1,11 +1,15 @@
 import { cookies } from 'next/headers';
 import { type NextRequest } from 'next/server';
 import { getBackendUrl } from '@/lib/api/client';
+import { getTenantFromHost } from '@/lib/tenant';
 
 async function proxy(req: NextRequest) {
   const store = await cookies();
   const token = store.get('cu_access')?.value;
-  const tenant = req.headers.get('x-tenant') || store.get('cu_tenant')?.value;
+  const hostTenant = getTenantFromHost(req.headers.get('host'));
+  const headerTenant = req.headers.get('x-tenant');
+  const cookieTenant = store.get('cu_tenant')?.value;
+  const tenant = (headerTenant || hostTenant || cookieTenant)?.toLowerCase().trim();
   const backend = getBackendUrl(tenant);
 
   let path = req.nextUrl.pathname.replace('/api/proxy', '');
@@ -22,6 +26,7 @@ async function proxy(req: NextRequest) {
     headers['Accept'] = incomingAccept;
   }
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (tenant) headers['x-tenant'] = tenant;
 
   const body = req.method !== 'GET' && req.method !== 'HEAD'
     ? await req.arrayBuffer()

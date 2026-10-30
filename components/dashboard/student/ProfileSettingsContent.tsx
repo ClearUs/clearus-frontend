@@ -112,7 +112,7 @@ export default function ProfileSettingsContent({
   const [profile, setProfile] = useState<StudentProfile | null>(null);
 
   // Editable fields simulation
-  const [email, setEmail] = useState(user.email || 'chinedu.okonkwo@student.futo.edu.ng');
+  const [email, setEmail] = useState(user.email || 'chinedu.okonkwo@futo.edu.ng');
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [phone, setPhone] = useState('+234 803 555 0142');
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -353,7 +353,7 @@ export default function ProfileSettingsContent({
                     Two-factor authentication
                   </h4>
                   <p className="text-[12px] text-[#9CA3AF]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    Required · codes are sent to c•••••u@student.futo.edu.ng
+                    Required · codes are sent to c•••••u@futo.edu.ng
                   </p>
                 </div>
               </div>
