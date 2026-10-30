@@ -1,5 +1,16 @@
+import { cookies } from 'next/headers';
 import { getBackendUrl } from '@/lib/api/client';
 import { isDevMode } from '@/lib/mode';
+
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  try {
+    const base64 = token.split('.')[1];
+    const json = Buffer.from(base64, 'base64url').toString('utf-8');
+    return JSON.parse(json);
+  } catch {
+    return {};
+  }
+}
 
 export async function POST(request: Request) {
   let email: string;
@@ -29,6 +40,15 @@ export async function POST(request: Request) {
     );
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN;
+  const cookieBase = {
+    secure: isProduction,
+    sameSite: 'lax' as const,
+    path: '/',
+    ...(isProduction && appDomain ? { domain: `.${appDomain}` } : {}),
+  };
+
   // Live upstream call: POST /api/v1/core/auth/verify-email/
   try {
     const backend = getBackendUrl(tenant);
@@ -43,6 +63,25 @@ export async function POST(request: Request) {
 
     const data = await upstream.json().catch(() => ({}));
     if (upstream.ok) {
+      const store = await cookies();
+      let userId = '';
+      if (typeof data.access === 'string') {
+        const claims = decodeJwtPayload(data.access);
+        userId = typeof claims.user_id === 'string' ? claims.user_id : '';
+        store.set('cu_access', data.access, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 });
+      }
+      if (typeof data.refresh === 'string') {
+        store.set('cu_refresh', data.refresh, { ...cookieBase, httpOnly: true, maxAge: 60 * 60 * 24 });
+      }
+      store.set('cu_role', 'student', { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+      store.set('cu_email', email, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+      if (userId) {
+        store.set('cu_user_id', userId, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+      }
+      if (tenant) {
+        store.set('cu_tenant', tenant, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+      }
+
       return Response.json({ verified: true, ...data });
     }
 
@@ -68,6 +107,13 @@ export async function POST(request: Request) {
       { detail: 'Invalid or expired verification code.' },
       { status: 400 },
     );
+  }
+
+  const store = await cookies();
+  store.set('cu_role', 'student', { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+  store.set('cu_email', email, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+  if (tenant) {
+    store.set('cu_tenant', tenant, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
   }
 
   return Response.json({ verified: true, simulated: true });
