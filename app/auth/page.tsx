@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, GraduationCap } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { INSTITUTIONS } from '@/data/institution';
 import UniversityCrest from '@/components/landing/UniversityCrest';
 import SchoolSplash from '@/components/auth/SchoolSplash';
@@ -23,7 +23,12 @@ export default function SelectUniversityPage() {
   const handleSelect = (code: string, name: string) => {
     setSplash({ code, name });
     setTimeout(() => {
-      router.push(`/auth/${code}`);
+      const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN;
+      if (appDomain) {
+        window.location.href = `https://${code.toLowerCase()}.${appDomain}/auth`;
+      } else {
+        router.push(`/auth/${code}`);
+      }
     }, 1800);
   };
 

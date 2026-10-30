@@ -1,9 +1,11 @@
-const FALLBACK_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://clearus-backend.onrender.com';
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN; // e.g. "clearus.tech"
+const DEFAULT_API_URL = API_DOMAIN ? `https://api.${API_DOMAIN}` : 'https://api.clearus.tech';
+const FALLBACK_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_URL;
 
 export function getBackendUrl(tenant?: string): string {
   if (API_DOMAIN && tenant) {
-    return `https://${tenant}-api.${API_DOMAIN}`;
+    const cleanTenant = tenant.toLowerCase().replace(/_schema$/, '').trim();
+    return `https://${cleanTenant}-api.${API_DOMAIN}`;
   }
   return FALLBACK_URL;
 }
