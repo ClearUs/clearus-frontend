@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { loginVerify2fa } from '@/lib/api/auth';
-import { ApiResponseError } from '@/lib/api/client';
+import { ApiResponseError, getBackendUrl } from '@/lib/api/client';
 import { getTenantFromHost } from '@/lib/tenant';
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
@@ -42,6 +42,31 @@ export async function POST(request: Request) {
     const claims = decodeJwtPayload(data.access);
     const userId = typeof claims.user_id === 'string' ? claims.user_id : '';
 
+    let role = 'student';
+    if (typeof claims.role === 'string') {
+      role = claims.role.toLowerCase();
+    } else if (claims.is_staff === true) {
+      role = 'staff';
+    } else {
+      try {
+        const backend = getBackendUrl(tenant);
+        const meRes = await fetch(`${backend}/api/v1/iam/students/me/`, {
+          headers: {
+            Authorization: `Bearer ${data.access}`,
+            Accept: 'application/json',
+            ...(tenant ? { 'x-tenant': tenant } : {}),
+          },
+        });
+        if (meRes.ok) {
+          role = 'student';
+        } else if (meRes.status === 404) {
+          role = 'staff';
+        }
+      } catch {
+        role = 'student';
+      }
+    }
+
     const store = await cookies();
     const isProduction = process.env.NODE_ENV === 'production';
     const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN; // e.g. "clearus.tech"
@@ -55,14 +80,14 @@ export async function POST(request: Request) {
 
     store.set('cu_access', data.access, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 });
     store.set('cu_refresh', data.refresh, { ...cookieBase, httpOnly: true, maxAge: 60 * 60 * 24 });
-    store.set('cu_role', 'staff', { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
+    store.set('cu_role', role, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     store.set('cu_email', email, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     store.set('cu_user_id', userId, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     if (tenant) {
       store.set('cu_tenant', tenant, { ...cookieBase, httpOnly: false, maxAge: 60 * 60 * 24 });
     }
 
-    return Response.json({ user_id: userId });
+    return Response.json({ user_id: userId, role });
   } catch (err) {
     if (err instanceof ApiResponseError) {
       return Response.json(
