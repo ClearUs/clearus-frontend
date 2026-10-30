@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import OtpInput from './OtpInput';
 import { getInstitutionByCode } from '@/data/institution';
-import CustomSelect from '@/components/shared/CustomSelect';
+import CustomSelect, { OptionGroup, SelectOption } from '@/components/shared/CustomSelect';
 
 interface PortalRecord {
   id?: string | number;
@@ -39,6 +39,10 @@ interface UnitRecord {
   pk?: string | number;
   name?: string;
   code_name?: string;
+  unit_type?: string;
+  depth?: number;
+  parent_id?: string | number | null;
+  children?: UnitRecord[];
   levels?: (string | number)[];
 }
 
@@ -118,13 +122,24 @@ export default function RegisterView({
   const defaultAllowed = localInst?.allowedDomains || ['futo.edu.ng', 'gmail.com'];
   const [allowedDomains, setAllowedDomains] = useState<string[]>(defaultAllowed);
 
-  const defaultUnits = (localInst?.departments || [
-    'Computer Engineering',
-    'School of Engineering and Engineering Technology',
-  ]).map((d, idx) => ({
-    id: idx === 0 ? 'fbf61b10-1ff4-4ca5-8be8-6e05d19a7699' : idx === 1 ? '45dc4520-e4e5-4aa0-84f6-f943e7e4ef00' : `unit_${idx + 1}`,
-    name: d,
-  }));
+  const defaultGroups: OptionGroup[] = [
+    {
+      groupName: 'School of Electrical Systems and Engineering Technology (SESET)',
+      options: [
+        { value: 'fbf61b10-1ff4-4ca5-8be8-6e05d19a7699', label: 'Computer Engineering' },
+      ],
+    },
+    {
+      groupName: 'School of Engineering and Engineering Technology (SEET)',
+      options: [
+        { value: '31c6a084-542d-46f0-a740-1d04a9bd5474', label: 'Civil Engineering' },
+      ],
+    },
+  ];
+
+  const defaultUnits = defaultGroups.flatMap((g) =>
+    g.options.map((opt) => ({ id: opt.value, name: opt.label }))
+  );
 
   const defaultLevels = [
     '100 Level',
@@ -136,8 +151,9 @@ export default function RegisterView({
   ];
 
   const [availableUnits, setAvailableUnits] = useState<{ id: string; name: string }[]>(defaultUnits);
+  const [departmentGroups, setDepartmentGroups] = useState<OptionGroup[]>(defaultGroups);
   const [availableLevels, setAvailableLevels] = useState<string[]>(defaultLevels);
-  const [selectedUnitId, setSelectedUnitId] = useState<string>('');
+  const [selectedUnitId, setSelectedUnitId] = useState<string>(defaultUnits[0]?.id || '');
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -225,23 +241,118 @@ export default function RegisterView({
         let unitsList: UnitRecord[] = [];
         if (Array.isArray(data)) {
           unitsList = data;
-        } else if (Array.isArray(data.units)) {
-          unitsList = data.units;
         } else if (Array.isArray(data.academic_units)) {
           unitsList = data.academic_units;
+        } else if (Array.isArray(data.units)) {
+          unitsList = data.units;
         } else if (Array.isArray(data.results)) {
           unitsList = data.results;
         }
 
         if (unitsList.length > 0) {
-          const mapped = unitsList.map((u: UnitRecord) => ({
-            id: String(u.id || u.pk || u.code_name || u.name),
-            name: String(u.name || u.code_name || 'Academic Unit'),
-          }));
-          setAvailableUnits(mapped);
-          if (mapped[0]?.id && !selectedUnitId) {
-            setSelectedUnitId(mapped[0].id);
-            setDepartment(mapped[0].name);
+          const parsedGroups: OptionGroup[] = [];
+          const allSelectableUnits: { id: string; name: string }[] = [];
+
+          // Case 1: Hierarchical tree (Faculties have children array containing Departments)
+          const hasTreeChildren = unitsList.some(
+            (u) => Array.isArray(u.children) && u.children.length > 0
+          );
+
+          if (hasTreeChildren) {
+            for (const parent of unitsList) {
+              if (Array.isArray(parent.children) && parent.children.length > 0) {
+                const groupTitle = String(parent.name || parent.code_name || 'Faculty');
+                const groupOptions: SelectOption[] = [];
+
+                for (const child of parent.children) {
+                  const childId = String(child.id || child.pk || child.code_name || child.name);
+                  const childName = String(child.name || child.code_name || 'Department');
+                  allSelectableUnits.push({ id: childId, name: childName });
+                  groupOptions.push({ value: childId, label: childName });
+                }
+
+                if (groupOptions.length > 0) {
+                  parsedGroups.push({
+                    groupName: groupTitle,
+                    options: groupOptions,
+                  });
+                }
+              } else if (!parent.parent_id && (parent.depth === 2 || parent.depth === undefined)) {
+                // Individual department node without subchildren
+                const unitId = String(parent.id || parent.pk || parent.code_name || parent.name);
+                const unitName = String(parent.name || parent.code_name || 'Department');
+                allSelectableUnits.push({ id: unitId, name: unitName });
+
+                let defGroup = parsedGroups.find((g) => g.groupName === 'Departments');
+                if (!defGroup) {
+                  defGroup = { groupName: 'Departments', options: [] };
+                  parsedGroups.push(defGroup);
+                }
+                defGroup.options.push({ value: unitId, label: unitName });
+              }
+            }
+          } else if (unitsList.some((u) => u.parent_id)) {
+            // Case 2: Relational flat list linked by parent_id
+            const parentMap = new Map<string, { name: string; options: SelectOption[] }>();
+            unitsList.forEach((u) => {
+              if (!u.parent_id) {
+                const pId = String(u.id || u.pk);
+                parentMap.set(pId, { name: String(u.name || u.code_name || 'Faculty'), options: [] });
+              }
+            });
+
+            unitsList.forEach((u) => {
+              if (u.parent_id) {
+                const pId = String(u.parent_id);
+                const childId = String(u.id || u.pk);
+                const childName = String(u.name || u.code_name || 'Department');
+                allSelectableUnits.push({ id: childId, name: childName });
+
+                const parent = parentMap.get(pId);
+                if (parent) {
+                  parent.options.push({ value: childId, label: childName });
+                } else {
+                  let defGroup = parsedGroups.find((g) => g.groupName === 'Departments');
+                  if (!defGroup) {
+                    defGroup = { groupName: 'Departments', options: [] };
+                    parsedGroups.push(defGroup);
+                  }
+                  defGroup.options.push({ value: childId, label: childName });
+                }
+              }
+            });
+
+            parentMap.forEach((val) => {
+              if (val.options.length > 0) {
+                parsedGroups.push({ groupName: val.name, options: val.options });
+              }
+            });
+          } else {
+            // Case 3: Flat list of departments
+            const flatOptions: SelectOption[] = unitsList.map((u) => {
+              const uId = String(u.id || u.pk || u.code_name || u.name);
+              const uName = String(u.name || u.code_name || 'Department');
+              allSelectableUnits.push({ id: uId, name: uName });
+              return { value: uId, label: uName };
+            });
+
+            parsedGroups.push({
+              groupName: 'Departments',
+              options: flatOptions,
+            });
+          }
+
+          if (allSelectableUnits.length > 0) {
+            setAvailableUnits(allSelectableUnits);
+            setDepartmentGroups(parsedGroups);
+
+            setSelectedUnitId((prev) => {
+              const exists = allSelectableUnits.some((u) => u.id === prev);
+              const newId = exists ? prev : allSelectableUnits[0].id;
+              const unit = allSelectableUnits.find((u) => u.id === newId);
+              if (unit) setDepartment(unit.name);
+              return newId;
+            });
           }
         }
 
@@ -274,7 +385,7 @@ export default function RegisterView({
       .catch((err) => {
         console.warn('[RegisterView] Failed to load registration units, using defaults:', err);
       });
-  }, [institutionCode, institutionName, selectedUnitId]);
+  }, [institutionCode, institutionName]);
 
   useEffect(() => {
     if (step !== 'verify-email' || verifyCountdown <= 0) return;
@@ -431,7 +542,7 @@ export default function RegisterView({
     }
 
     if (!selectedUnitId) {
-      setErrorMsg('Please select your academic unit / department.');
+      setErrorMsg('Please select your department.');
       return;
     }
 
@@ -773,8 +884,9 @@ export default function RegisterView({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">Academic unit / department</label>
+                <label className="block text-sm font-medium text-gray-700">Department</label>
                 <CustomSelect
+                  groups={departmentGroups}
                   options={availableUnits.map((u) => ({ value: u.id, label: u.name }))}
                   value={selectedUnitId}
                   onChange={(val) => {
@@ -783,7 +895,7 @@ export default function RegisterView({
                     if (unit) setDepartment(unit.name);
                     if (errorMsg) setErrorMsg('');
                   }}
-                  placeholder="Select your academic unit / department"
+                  placeholder="Select your department"
                 />
               </div>
 
@@ -825,6 +937,7 @@ export default function RegisterView({
                     if (errorMsg) setErrorMsg('');
                   }}
                   placeholder="Select your level"
+                  searchable={false}
                 />
               </div>
 
