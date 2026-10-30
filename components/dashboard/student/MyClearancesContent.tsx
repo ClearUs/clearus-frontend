@@ -7,7 +7,7 @@ import { STUDENT_CLEARANCES, type ClearanceItem } from '@/data/studentClearances
 interface MyClearancesContentProps {
   user: User;
   selectedClearanceId?: string | null;
-  onSelectClearance?: (clearanceId: string) => void;
+  onSelectClearance?: (clearanceId: string, stepId?: string) => void;
   onNavigate?: (section: string) => void;
 }
 

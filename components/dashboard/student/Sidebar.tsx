@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/types';
 import Image from 'next/image';
+import SignOutConfirmModal from '@/components/dashboard/student/SignOutConfirmModal';
+import ContactRegistryModal from '@/components/dashboard/student/ContactRegistryModal';
 
 interface SidebarProps {
   user: User;
@@ -177,8 +179,11 @@ export default function StudentSidebar({
   unreadCount = 2,
 }: SidebarProps) {
   const router = useRouter();
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+  const [isContactRegistryModalOpen, setIsContactRegistryModalOpen] = useState(false);
 
-  const handleLogout = () => {
+  const handleConfirmLogout = () => {
+    setIsSignOutModalOpen(false);
     router.push('/auth/signed-out');
   };
   return (
@@ -345,9 +350,7 @@ export default function StudentSidebar({
               </p>
               <button
                 type="button"
-                onClick={() => {
-                  window.open('mailto:registry@clearus.tech?subject=Clearance%20Support%20Request', '_blank');
-                }}
+                onClick={() => setIsContactRegistryModalOpen(true)}
                 className="w-full py-2.5 bg-[#13241A] text-white text-[13px] font-semibold rounded-lg hover:bg-[#0D1A12] transition-colors cursor-pointer"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
@@ -360,9 +363,7 @@ export default function StudentSidebar({
         <div className="flex justify-center pb-3">
           <button
             type="button"
-            onClick={() => {
-              window.open('mailto:registry@clearus.tech?subject=Clearance%20Support%20Request', '_blank');
-            }}
+            onClick={() => setIsContactRegistryModalOpen(true)}
             className="w-10 h-10 rounded-lg bg-[#D1FAE5] flex items-center justify-center hover:bg-[#A7F3D0] transition-colors cursor-pointer"
             title="Need help?"
           >
@@ -376,7 +377,7 @@ export default function StudentSidebar({
         {collapsed ? (
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => setIsSignOutModalOpen(true)}
             className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-[#E8ECEB] transition-colors cursor-pointer"
             title="Log out"
           >
@@ -385,7 +386,7 @@ export default function StudentSidebar({
         ) : (
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => setIsSignOutModalOpen(true)}
             className="flex items-center gap-2.5 px-3 py-2 text-[14px] font-medium text-[#5F6D64] hover:text-[#13241A] transition-colors cursor-pointer w-full text-left"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
@@ -394,6 +395,19 @@ export default function StudentSidebar({
           </button>
         )}
       </div>
+
+      {/* Contact Registry Modal */}
+      <ContactRegistryModal
+        isOpen={isContactRegistryModalOpen}
+        onClose={() => setIsContactRegistryModalOpen(false)}
+      />
+
+      {/* Sign Out Confirmation Modal */}
+      <SignOutConfirmModal
+        isOpen={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirmSignOut={handleConfirmLogout}
+      />
     </aside>
   );
 }

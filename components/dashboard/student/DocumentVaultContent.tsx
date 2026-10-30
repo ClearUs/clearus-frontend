@@ -5,6 +5,8 @@ import type { User } from '@/types';
 import { INITIAL_VAULT_DOCUMENTS, type VaultDocument } from '@/data/studentVault';
 import type { UploadContext } from '@/components/dashboard/student/UploadDocumentModal';
 import DocumentPreviewModal from '@/components/dashboard/student/DocumentPreviewModal';
+import DocumentDetailsModal from '@/components/dashboard/student/DocumentDetailsModal';
+import DocumentRemoveModal from '@/components/dashboard/student/DocumentRemoveModal';
 import { uploadVaultAsset, downloadVaultAsset } from '@/lib/api';
 
 interface DocumentVaultContentProps {
@@ -13,7 +15,7 @@ interface DocumentVaultContentProps {
   onNavigate?: (section: string) => void;
 }
 
-type FilterType = 'all' | 'in_review' | 'approved';
+type FilterType = 'all' | 'in_review';
 
 /* ─── SVG Icons ─── */
 
@@ -47,28 +49,59 @@ function UploadIcon() {
   );
 }
 
+function FileCardIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path
+        d="M13 2H5C3.89543 2 3 2.89543 3 4V18C3 19.1046 3.89543 20 5 20H17C18.1046 20 19 19.1046 19 18V8L13 2Z"
+        stroke="#15803D"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13 2V8H19"
+        stroke="#15803D"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M7 12H9" stroke="#15803D" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M7 16H15" stroke="#15803D" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function EyeIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
       <path
-        d="M1.5 8C2.8 4.8 5.2 3 8 3C10.8 3 13.2 4.8 14.5 8C13.2 11.2 10.8 13 8 13C5.2 13 2.8 11.2 1.5 8Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
+        d="M1.5 9C2.85 5.4 5.7 3.375 9 3.375C12.3 3.375 15.15 5.4 16.5 9C15.15 12.6 12.3 14.625 9 14.625C5.7 14.625 2.85 12.6 1.5 9Z"
+        stroke="#15803D"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
+      <circle cx="9" cy="9" r="2.8" stroke="#15803D" strokeWidth="1.6" />
     </svg>
   );
 }
 
 function DownloadIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
       <path
-        d="M8 2.5V10.5M8 10.5L5 7.5M8 10.5L11 7.5M2.5 13.5H13.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
+        d="M9 2.5V11.5M9 11.5L5.5 8M9 11.5L12.5 8"
+        stroke="#15803D"
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+      <path
+        d="M2.5 14.5H15.5"
+        stroke="#15803D"
+        strokeWidth="1.6"
+        strokeLinecap="round"
       />
     </svg>
   );
@@ -76,11 +109,33 @@ function DownloadIcon() {
 
 function DetailsIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <path
-        d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z"
-        stroke="currentColor"
+        d="M11 2L14 5L5 14H2V11L11 2Z"
+        stroke="#15803D"
         strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9.5 3.5L12.5 6.5" stroke="#15803D" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function UploadCloudIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M12 16V6M12 6L7.5 10.5M12 6L16.5 10.5"
+        stroke="#15803D"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3 17V18C3 19.6569 4.34315 21 6 21H18C19.6569 21 21 19.6569 21 18V17"
+        stroke="#15803D"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -97,6 +152,20 @@ function InfoCircleIcon() {
   );
 }
 
+function _TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M2.5 4.5H13.5M6 7V11.5M10 7V11.5M5.5 4.5V2.5C5.5 2.22386 5.72386 2 6 2H10C10.2761 2 10.5 2.22386 10.5 2.5V4.5M12.5 4.5V13.5C12.5 13.7761 12.2761 14 12 14H4C3.72386 14 3.5 13.7761 3.5 13.5V4.5H12.5Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function DocumentVaultContent({
   user: _user,
   onOpenUploadModal,
@@ -104,8 +173,9 @@ export default function DocumentVaultContent({
   const [documents, setDocuments] = useState<VaultDocument[]>(INITIAL_VAULT_DOCUMENTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [activeModalDoc, setActiveModalDoc] = useState<VaultDocument | null>(null);
-  const [modalMode, setModalMode] = useState<'preview' | 'details'>('preview');
+  const [activePreviewDoc, setActivePreviewDoc] = useState<VaultDocument | null>(null);
+  const [activeDetailsDoc, setActiveDetailsDoc] = useState<VaultDocument | null>(null);
+  const [activeRemoveDoc, setActiveRemoveDoc] = useState<VaultDocument | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dropzoneInputRef = useRef<HTMLInputElement>(null);
 
@@ -113,14 +183,12 @@ export default function DocumentVaultContent({
     return {
       all: documents.length,
       in_review: documents.filter((d) => d.status === 'in_review').length,
-      approved: documents.filter((d) => d.status === 'approved').length,
     };
   }, [documents]);
 
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
       if (activeFilter === 'in_review' && doc.status !== 'in_review') return false;
-      if (activeFilter === 'approved' && doc.status !== 'approved') return false;
 
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
@@ -133,9 +201,15 @@ export default function DocumentVaultContent({
     });
   }, [documents, activeFilter, searchQuery]);
 
-  const handleOpenModal = (doc: VaultDocument, mode: 'preview' | 'details') => {
-    setActiveModalDoc(doc);
-    setModalMode(mode);
+  const handleSaveDocumentTitle = (docId: string, newTitle: string) => {
+    setDocuments((prev) =>
+      prev.map((doc) => (doc.id === docId ? { ...doc, name: newTitle } : doc))
+    );
+    setActivePreviewDoc((prev) => (prev && prev.id === docId ? { ...prev, name: newTitle } : prev));
+  };
+
+  const handleConfirmRemove = (docId: string) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
   };
 
   const handleDownload = async (doc: VaultDocument) => {
@@ -183,7 +257,7 @@ export default function DocumentVaultContent({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 xl:px-10 py-8 min-w-0 bg-white">
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 xl:px-10 py-6 sm:py-8 min-w-0 bg-white">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
         <div>
@@ -202,6 +276,7 @@ export default function DocumentVaultContent({
               clearanceTitle: 'Document Vault',
               stepTitle: 'Upload Clearance File',
               docDescription: 'PDF, JPG or PNG up to 5 MB',
+              allowVaultChoice: false,
             })
           }
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#15803D] text-white text-[13px] font-semibold hover:bg-[#14532D] transition-colors cursor-pointer shadow-xs self-start sm:self-auto"
@@ -212,8 +287,8 @@ export default function DocumentVaultContent({
         </button>
       </div>
 
-      {/* Metrics Cards (Row of 4) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* Metrics Cards (Row of 3) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {/* Card 1: Documents tracked */}
         <div className="rounded-2xl border border-[#E2EBE5] bg-white p-5 shadow-xs relative">
           <div className="flex items-center justify-between text-[#5F6D64] mb-2">
@@ -226,7 +301,7 @@ export default function DocumentVaultContent({
             {counts.all}
           </p>
           <p className="text-[12px] text-[#5F6D64]" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {counts.approved} approved · {counts.in_review} in review
+            {counts.in_review} in review
           </p>
         </div>
 
@@ -246,23 +321,7 @@ export default function DocumentVaultContent({
           </p>
         </div>
 
-        {/* Card 3: Approved */}
-        <div className="rounded-2xl border border-[#E2EBE5] bg-white p-5 shadow-xs relative">
-          <div className="flex items-center justify-between text-[#5F6D64] mb-2">
-            <span className="text-[13px] font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Approved
-            </span>
-            <InfoCircleIcon />
-          </div>
-          <p className="text-[28px] font-bold text-[#13241A] font-jakarta mb-1">
-            {counts.approved}
-          </p>
-          <p className="text-[12px] text-[#5F6D64]" style={{ fontFamily: 'Inter, sans-serif' }}>
-            Locked after approval
-          </p>
-        </div>
-
-        {/* Card 4: Storage used */}
+        {/* Card 3: Storage used */}
         <div className="rounded-2xl border border-[#E2EBE5] bg-white p-5 shadow-xs relative">
           <div className="flex items-center justify-between text-[#5F6D64] mb-2">
             <span className="text-[13px] font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -311,19 +370,6 @@ export default function DocumentVaultContent({
           >
             In review <span className="opacity-90">{counts.in_review}</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveFilter('approved')}
-            className={`px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeFilter === 'approved'
-                ? 'bg-[#15803D] text-white shadow-xs'
-                : 'border border-[#E2EBE5] bg-white text-[#33463A] hover:bg-[#F7FBF8]'
-            }`}
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Approved <span className="opacity-90">{counts.approved}</span>
-          </button>
         </div>
 
         {/* Search input */}
@@ -353,60 +399,61 @@ export default function DocumentVaultContent({
 
       {/* Documents Grid */}
       {filteredDocuments.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 mb-8">
           {filteredDocuments.map((doc) => (
             <div
               key={doc.id}
-              className="rounded-2xl border border-[#E2EBE5] bg-white p-5 shadow-xs hover:border-[#C9D8CE] transition-all flex flex-col justify-between"
+              className="rounded-xl border border-[#E2EBE5] bg-white p-4 sm:p-5 shadow-xs hover:border-[#C9D8CE] transition-all flex flex-col justify-between min-h-[258px] min-w-0 overflow-hidden"
             >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] flex items-center justify-center text-[#15803D] shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M11.667 2.5H5.83366C4.91319 2.5 4.16699 3.24619 4.16699 4.16667V15.8333C4.16699 16.7538 4.91319 17.5 5.83366 17.5H14.167C15.0875 17.5 15.8337 16.7538 15.8337 15.8333V6.66667L11.667 2.5Z"
-                        stroke="#15803D"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M11.667 2.5V6.66667H15.8337"
-                        stroke="#15803D"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+              <div className="min-w-0">
+                {/* Top: Icon + In Review Badge */}
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
+                    <FileCardIcon />
                   </div>
 
                   {doc.status === 'in_review' && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#FEF3C7] text-[#B45309] font-sans">
+                    <span
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
                       In review
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-[15px] font-semibold text-[#13241A] font-jakarta mb-1 truncate" title={doc.name}>
-                  {doc.name}
-                </h3>
-                <p className="text-[12px] text-[#9CA3AF] mb-3" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {doc.type} · {doc.size} · Uploaded {doc.uploadedDate}
-                </p>
+                {/* Inner Card (Help Card) with Title, Meta, and Step Tag */}
+                <div className="rounded-[7px] border border-[#E2EBE5] bg-[#F7FBF8] p-3 mb-4 min-w-0">
+                  <h3
+                    className="text-[15px] sm:text-[16px] font-bold text-[#13241A] font-jakarta leading-6 truncate mb-1"
+                    title={doc.name}
+                  >
+                    {doc.name}
+                  </h3>
+                  <p
+                    className="text-[12px] sm:text-[13px] text-[#5E7165] font-sans leading-5 mb-3 truncate"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {doc.type} · {doc.size} · Uploaded {doc.uploadedDate}
+                  </p>
 
-                <div className="mb-4">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#F3F6F4] text-[#5F6D64] font-sans">
-                    {doc.clearanceCategory}
-                  </span>
+                  <div className="flex items-center min-w-0">
+                    <span
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-semibold text-[#33463A] bg-[#F0FDF4] border border-[#E2EBE5] max-w-full truncate"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      <span className="truncate">{doc.clearanceCategory}</span>
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center gap-4 pt-3 border-t border-[#F0F4F1] text-[13px] font-medium text-[#13241A]">
+              <div className="flex items-center flex-wrap gap-1 sm:gap-1.5 pt-1 -ml-1">
                 <button
                   type="button"
-                  onClick={() => handleOpenModal(doc, 'preview')}
-                  className="flex items-center gap-1.5 hover:text-[#15803D] transition-colors cursor-pointer"
+                  onClick={() => setActivePreviewDoc(doc)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[13px] sm:text-[14px] font-semibold text-[#15803D] hover:bg-[#F0FDF4] transition-colors cursor-pointer shrink-0"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   <EyeIcon />
@@ -415,7 +462,7 @@ export default function DocumentVaultContent({
                 <button
                   type="button"
                   onClick={() => handleDownload(doc)}
-                  className="flex items-center gap-1.5 hover:text-[#15803D] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[13px] sm:text-[14px] font-semibold text-[#15803D] hover:bg-[#F0FDF4] transition-colors cursor-pointer shrink-0"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   <DownloadIcon />
@@ -423,8 +470,8 @@ export default function DocumentVaultContent({
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleOpenModal(doc, 'details')}
-                  className="flex items-center gap-1.5 hover:text-[#15803D] transition-colors cursor-pointer"
+                  onClick={() => setActiveDetailsDoc(doc)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[13px] sm:text-[14px] font-semibold text-[#15803D] hover:bg-[#F0FDF4] transition-colors cursor-pointer shrink-0"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   <DetailsIcon />
@@ -433,6 +480,54 @@ export default function DocumentVaultContent({
               </div>
             </div>
           ))}
+
+          {/* Drag & Drop Card in Grid matching Figma [205:5597] */}
+          {!searchQuery && (
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDropFiles}
+              className={`min-h-[240px] sm:min-h-[258px] rounded-xl border border-dashed p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all min-w-0 ${
+                isDragging
+                  ? 'border-[#15803D] bg-[#DCFCE7]'
+                  : 'border-[#16A34A] bg-[#F0FDF4] hover:bg-[#E9F9EE]'
+              }`}
+            >
+              <input
+                ref={dropzoneInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              <div className="w-12 h-12 sm:w-[52px] sm:h-[52px] rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] mb-3 sm:mb-3.5 shrink-0">
+                <UploadCloudIcon />
+              </div>
+
+              <p className="text-[15px] sm:text-[16px] font-bold text-[#13241A] font-jakarta mb-1 sm:mb-1.5 max-w-full truncate px-2">
+                Drag and drop files here
+              </p>
+              <p
+                className="text-[13px] sm:text-[14px] text-[#5E7165] mb-4 sm:mb-5 max-w-full px-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                PDF, JPG or PNG · up to 5 MB each
+              </p>
+
+              <button
+                type="button"
+                onClick={() => dropzoneInputRef.current?.click()}
+                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl border border-[#16A34A] bg-white text-[13px] sm:text-[14px] font-semibold text-[#15803D] hover:bg-[#F0FDF4] transition-colors cursor-pointer shadow-xs whitespace-nowrap"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Browse files
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         /* Empty State */
@@ -463,70 +558,32 @@ export default function DocumentVaultContent({
         </div>
       )}
 
-      {/* Drag & Drop Dropzone at Bottom */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDropFiles}
-        className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center text-center transition-all ${
-          isDragging
-            ? 'border-[#15803D] bg-[#F0FDF4]'
-            : 'border-[#86EFAC] bg-white hover:bg-[#F7FBF8]'
-        }`}
-      >
-        <input
-          ref={dropzoneInputRef}
-          type="file"
-          accept=".pdf,.png,.jpg,.jpeg"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-
-        <div className="w-12 h-12 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] mb-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 16V8M12 8L8.5 11.5M12 8L15.5 11.5"
-              stroke="#15803D"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16"
-              stroke="#15803D"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        <p className="text-[15px] font-bold text-[#13241A] font-jakarta mb-1">
-          Drag and drop files here
-        </p>
-        <p className="text-[12px] text-[#8A9A90] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-          PDF, JPG or PNG · up to 5 MB each
-        </p>
-
-        <button
-          type="button"
-          onClick={() => dropzoneInputRef.current?.click()}
-          className="px-5 py-2 rounded-xl border border-[#C9D8CE] bg-white text-[13px] font-semibold text-[#13241A] hover:bg-[#F7FBF8] transition-colors cursor-pointer shadow-xs"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
-          Browse files
-        </button>
-      </div>
-
-      {/* Preview / Details Modal */}
+      {/* Preview Modal */}
       <DocumentPreviewModal
-        isOpen={!!activeModalDoc}
-        document={activeModalDoc}
-        mode={modalMode}
-        onClose={() => setActiveModalDoc(null)}
+        isOpen={!!activePreviewDoc}
+        document={activePreviewDoc}
+        onClose={() => setActivePreviewDoc(null)}
+        onEditDetails={(doc) => {
+          setActivePreviewDoc(null);
+          setActiveDetailsDoc(doc);
+        }}
+        onDownload={handleDownload}
+      />
+
+      {/* Details Modal (Dynamic Title Editing) */}
+      <DocumentDetailsModal
+        isOpen={!!activeDetailsDoc}
+        document={activeDetailsDoc}
+        onClose={() => setActiveDetailsDoc(null)}
+        onSaveTitle={handleSaveDocumentTitle}
+      />
+
+      {/* Remove Confirm Modal */}
+      <DocumentRemoveModal
+        isOpen={!!activeRemoveDoc}
+        document={activeRemoveDoc}
+        onClose={() => setActiveRemoveDoc(null)}
+        onConfirmRemove={handleConfirmRemove}
       />
     </div>
   );
