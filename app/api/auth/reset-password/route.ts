@@ -6,12 +6,14 @@ export async function POST(request: Request) {
   let email: string;
   let code: string;
   let new_password: string;
+  let tenant: string | undefined;
 
   try {
     const body = await request.json();
     email = body.email;
     code = body.code;
     new_password = body.new_password;
+    tenant = body.tenant || body.institution;
   } catch {
     return Response.json(
       { detail: 'Invalid request body.' },
@@ -26,10 +28,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const tenant = getTenantFromHost(request.headers.get('host'));
+  const hostTenant = getTenantFromHost(request.headers.get('host'));
+  const targetTenant = (tenant || hostTenant || 'futo').toLowerCase().trim();
 
   try {
-    await resetPasswordConfirm({ email, code, new_password }, tenant);
+    await resetPasswordConfirm({ email, code, new_password }, targetTenant);
     return Response.json({ success: true });
   } catch (err) {
     if (err instanceof ApiResponseError) {

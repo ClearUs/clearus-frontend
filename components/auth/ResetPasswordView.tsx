@@ -10,7 +10,7 @@ interface ResetPasswordViewProps {
   onBack: () => void;
 }
 
-type Step = 'enter-email' | 'email-sent' | 'link-expired' | 'verify-and-reset' | 'success';
+type Step = 'enter-email' | 'link-expired' | 'verify-and-reset' | 'success';
 
 export default function ResetPasswordView({
   initialEmail,
@@ -28,7 +28,7 @@ export default function ResetPasswordView({
   const [resendCountdown, setResendCountdown] = useState(120);
 
   useEffect(() => {
-    if (step !== 'email-sent' || resendCountdown <= 0) return;
+    if (step !== 'verify-and-reset' || resendCountdown <= 0) return;
     const t = setInterval(() => setResendCountdown(c => c - 1), 1000);
     return () => clearInterval(t);
   }, [step, resendCountdown]);
@@ -46,7 +46,12 @@ export default function ResetPasswordView({
       const res = await fetch('/api/auth/request-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), purpose: 'password_reset' }),
+        body: JSON.stringify({
+          email: email.trim(),
+          purpose: 'password_reset',
+          institution: _institutionCode,
+          tenant: _institutionCode,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -54,7 +59,7 @@ export default function ResetPasswordView({
         return;
       }
       setResendCountdown(120);
-      setStep('email-sent');
+      setStep('verify-and-reset');
     } catch {
       setErrorMsg('Network error. Please try again.');
     } finally {
@@ -82,6 +87,8 @@ export default function ResetPasswordView({
           email: email.trim(),
           code: digits.join(''),
           new_password: newPassword,
+          institution: _institutionCode,
+          tenant: _institutionCode,
         }),
       });
       if (!res.ok) {
@@ -148,41 +155,6 @@ export default function ResetPasswordView({
           </>
         )}
 
-        {step === 'email-sent' && (
-          <div className="text-center">
-            <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
-              <Mail className="w-7 h-7 text-green-700" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
-              Check your email
-            </h1>
-            <p className="text-gray-500 text-sm mb-4">
-              We sent a 6-digit code to <span className="font-medium text-gray-700">{maskedEmail}</span>.
-              Enter it along with your new password to reset your account.
-            </p>
-            <p className="text-xs text-gray-400 mb-8 flex items-center justify-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-              Didn&apos;t find it? Check your spam or junk folder.
-            </p>
-            <button
-              type="button"
-              onClick={() => setStep('verify-and-reset')}
-              className="w-full py-3.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-xl transition-colors text-sm cursor-pointer"
-            >
-              Open to sign in
-            </button>
-            <p className="mt-4 text-sm text-gray-400">
-              {resendCountdown > 0 ? (
-                <>Resend code in {Math.floor(resendCountdown / 60).toString().padStart(2, '0')}:{(resendCountdown % 60).toString().padStart(2, '0')}</>
-              ) : (
-                <button type="button" onClick={(e) => { handleRequestCode(e); }} className="text-green-700 hover:underline font-medium cursor-pointer">
-                  Resend code
-                </button>
-              )}
-            </p>
-          </div>
-        )}
-
         {step === 'link-expired' && (
           <div className="text-center">
             <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
@@ -212,8 +184,13 @@ export default function ResetPasswordView({
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
               Enter code & new password
             </h1>
-            <p className="text-gray-500 text-sm mb-8">
-              Enter the 6-digit code sent to your email along with your new password.
+            <p className="text-gray-500 text-sm mb-2">
+              We sent a 6-digit code to <span className="font-medium text-gray-700">{maskedEmail}</span>.
+              Enter it along with your new password to reset your account.
+            </p>
+            <p className="text-xs text-gray-400 mb-6 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+              Didn&apos;t find it? Check your spam or junk folder.
             </p>
             <form onSubmit={handleResetPassword} className="space-y-5">
               <div className="space-y-1.5">
@@ -271,6 +248,15 @@ export default function ResetPasswordView({
                 {isLoading ? 'Resetting...' : 'Reset password'}
               </button>
             </form>
+            <p className="mt-4 text-center text-sm text-gray-400">
+              {resendCountdown > 0 ? (
+                <>Resend code in {Math.floor(resendCountdown / 60).toString().padStart(2, '0')}:{(resendCountdown % 60).toString().padStart(2, '0')}</>
+              ) : (
+                <button type="button" onClick={(e) => { handleRequestCode(e); }} className="text-green-700 hover:underline font-medium cursor-pointer">
+                  Resend code
+                </button>
+              )}
+            </p>
           </>
         )}
 
