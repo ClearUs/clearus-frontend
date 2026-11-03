@@ -335,12 +335,12 @@ export default function RequestSchoolPage() {
             {/* Request Summary Box [404:2632] (fill=#F7FBF8, stroke=#E2EBE5, r=14, p=16px 20px) */}
             <div className="rounded-2xl border border-[#E2EBE5] bg-[#F7FBF8] p-4 sm:p-5 flex flex-col gap-2.5">
               {/* Row: Reference */}
-              <div className="flex items-center justify-between text-[13px] font-sans">
+              {/* <div className="flex items-center justify-between text-[13px] font-sans">
                 <span className="text-[#5E7165]">Reference</span>
                 <span className="text-[#13241A] font-medium font-mono">
                   {submissionResult.reference}
                 </span>
-              </div>
+              </div> */}
 
               {/* Row: School */}
               <div className="flex items-center justify-between text-[13px] font-sans">
