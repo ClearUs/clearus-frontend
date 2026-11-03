@@ -2,6 +2,7 @@ export interface Institution {
   code: string;
   name: string;
   shortName: string;
+  domain?: string;
   motto: string;
   primaryColor: string;
   accentColor: string;

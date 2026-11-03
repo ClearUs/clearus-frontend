@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight as _ArrowRight } from 'lucide-react';
 import { INSTITUTIONS } from '@/data/institution';
-import UniversityCrest from '@/components/landing/UniversityCrest';
+import _UniversityCrest from '@/components/landing/UniversityCrest';
 import SchoolSplash from '@/components/auth/SchoolSplash';
 import AuthShell from '@/components/auth/AuthShell';
 import BrandPanel from '@/components/auth/BrandPanel';
@@ -14,13 +14,13 @@ export default function SelectUniversityPage() {
   const [query, setQuery] = useState('');
   const [splash, setSplash] = useState<{ code: string; name: string } | null>(null);
 
-  const filtered = INSTITUTIONS.filter(
+  const _filtered = INSTITUTIONS.filter(
     i =>
       i.name.toLowerCase().includes(query.toLowerCase()) ||
       i.code.toLowerCase().includes(query.toLowerCase()),
   );
 
-  const handleSelect = (code: string, name: string) => {
+  const _handleSelect = (code: string, name: string) => {
     setSplash({ code, name });
     setTimeout(() => {
       const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN;
@@ -68,6 +68,8 @@ export default function SelectUniversityPage() {
               />
             </div>
 
+            {/* School cards commented out until universities are onboarded */}
+            {/*
             <div className="space-y-2">
               {filtered.map(inst => (
                 <button
@@ -92,6 +94,22 @@ export default function SelectUniversityPage() {
                   No universities found matching &ldquo;{query}&rdquo;
                 </p>
               )}
+            </div>
+            */}
+
+            {/* Empty onboarding state */}
+            <div className="py-8 text-center bg-[#F7FBF8] rounded-xl border border-[#E2EBE5] p-6">
+              <div className="w-10 h-10 rounded-full bg-[#DCFCE7] text-[#16A34A] flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold text-gray-900 mb-1">
+                No universities active yet
+              </p>
+              <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                Institutions are currently being onboarded. Check back soon or contact your school registry.
+              </p>
             </div>
           </div>
 

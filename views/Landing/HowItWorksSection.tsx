@@ -45,7 +45,7 @@ export default function HowItWorksSection() {
   };
 
   return (
-    <section id="how-it-works" className="w-full bg-white py-16 sm:py-24 border-t border-[#E2EBE5]/60 overflow-hidden">
+    <section id="how-it-works" className="w-full bg-white py-16 sm:py-24 border-t border-[#E2EBE5]/60 overflow-hidden scroll-mt-20 sm:scroll-mt-24">
       <div className="w-full max-w-310 mx-auto px-4 sm:px-6">
         {/* Section Heading matching Figma [385:358] (679x94, NO EYEBROW) */}
         <div className="max-w-170 mx-auto text-center mb-12 sm:mb-16">

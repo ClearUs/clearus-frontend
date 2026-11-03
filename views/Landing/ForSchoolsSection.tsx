@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const SCHOOL_BULLETS = [
   'Build your own clearance process',
@@ -68,14 +69,14 @@ export default function ForSchoolsSection() {
 
             {/* CTA Button matching Figma [385:2188] */}
             <div className="mt-3">
-              <a
-                href="mailto:partnerships@clearus.tech?subject=Bring%20ClearUs%20to%20our%20institution"
+              <Link
+                href="/request-school"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#16A34A] text-white text-[15px] font-semibold hover:bg-[#15803D] shadow-xs hover:shadow-md transition-all duration-300 group"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 <span>Bring ClearUs to your school</span>
                 <span className="transition-transform group-hover:translate-x-1">→</span>
-              </a>
+              </Link>
             </div>
           </div>
 

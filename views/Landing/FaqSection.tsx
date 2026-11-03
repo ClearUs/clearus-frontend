@@ -51,7 +51,7 @@ export default function FaqSection() {
   };
 
   return (
-    <section id="faq" className="w-full bg-white py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden">
+    <section id="faq" className="w-full bg-white py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden scroll-mt-20 sm:scroll-mt-24">
       <div className="w-full max-w-312 mx-auto px-4 sm:px-6 lg:px-8">
         {/* FAQ Heading matching Figma [385:2202] (NO EYEBROW - visible: false in Figma) */}
         <div className="max-w-155 mx-auto text-center mb-12 sm:mb-14">

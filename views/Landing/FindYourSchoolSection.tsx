@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { INSTITUTIONS } from '@/data/institution';
 import { Institution } from '@/types';
-import UniversityCrest from '@/components/landing/UniversityCrest';
+// import UniversityCrest from '@/components/landing/UniversityCrest';
 
 interface FindYourSchoolSectionProps {
   onSelectSchool: (school: Institution) => void;
@@ -39,7 +40,7 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
   };
 
   return (
-    <section id="find-school" className="w-full bg-[#F0FDF4] py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden">
+    <section id="find-school" className="w-full bg-[#F0FDF4] py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden scroll-mt-20 sm:scroll-mt-24">
       <div className="w-full max-w-312 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Directory heading matching Figma [385:2135] (NO EYEBROW - visible: false in Figma) */}
         <div className="max-w-160 mx-auto text-center mb-10 sm:mb-12">
@@ -91,7 +92,8 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
           </div>
         </form>
 
-        {/* School Grid matching Figma [385:2142] (4 cards, 284x237, r=20, bg=white, border=#E2EBE5, p=24) */}
+        {/* School cards commented out until universities are onboarded */}
+        {/*
         {filteredInstitutions.length > 0 ? (
           <div className="max-w-300 mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {filteredInstitutions.map((school) => {
@@ -103,19 +105,15 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
                   onClick={() => onSelectSchool(school)}
                   className="rounded-[20px] bg-white border border-[#E2EBE5] p-6 flex flex-col justify-between h-59.25 shadow-2xs hover:border-[#16A34A] hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
                 >
-                  {/* Top Frame [385:2144] */}
                   <div className="flex flex-col">
-                    {/* Crest Icon [385:2145] */}
                     <div className="w-13.5 h-13 relative mb-3 flex items-center justify-start shrink-0">
                       <UniversityCrest code={school.code} width={54} height={52} />
                     </div>
 
-                    {/* School Name [385:2146] */}
                     <h3 className="text-[16px] sm:text-[17px] font-bold text-[#13241A] font-jakarta leading-5.75 group-hover:text-[#16A34A] transition-colors line-clamp-2">
                       {school.name}
                     </h3>
 
-                    {/* Domain [385:2147] */}
                     <span
                       className="text-[13px] sm:text-[14px] font-medium text-[#15803D] mt-1.5 truncate"
                       style={{ fontFamily: 'Inter, sans-serif' }}
@@ -124,7 +122,6 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
                     </span>
                   </div>
 
-                  {/* Action Link [385:2148] */}
                   <div
                     className="text-[13px] sm:text-[14px] font-semibold text-[#13241A] flex items-center gap-1 group-hover:text-[#16A34A] transition-colors pt-2 border-t border-[#E2EBE5]/40"
                     style={{ fontFamily: 'Inter, sans-serif' }}
@@ -137,13 +134,36 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
             })}
           </div>
         ) : (
-          /* Empty state if search returns nothing */
           <div className="max-w-100 mx-auto text-center py-8">
             <p className="text-[15px] text-[#5E7165]" style={{ fontFamily: 'Inter, sans-serif' }}>
               No university found matching &quot;{searchQuery}&quot;.
             </p>
           </div>
         )}
+        */}
+
+        {/* Global directory onboarding placeholder */}
+        <div className="max-w-160 mx-auto text-center py-10 px-6 rounded-2xl bg-white border border-[#E2EBE5] shadow-xs">
+          <div className="w-12 h-12 rounded-full bg-[#F0FDF4] text-[#16A34A] flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 className="text-[18px] font-bold text-[#13241A] font-jakarta mb-1.5">
+            Universities are currently being onboarded
+          </h3>
+          <p className="text-[14px] text-[#5E7165] max-w-120 mx-auto leading-relaxed mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+            We are actively integrating with Nigerian university registries. Your institution&apos;s dedicated portal will be accessible here soon.
+          </p>
+          <Link
+            href="/request-school"
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#15803D] hover:text-[#14532D] hover:underline"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <span>Bring ClearUs to your school</span>
+            <span>→</span>
+          </Link>
+        </div>
 
         {/* Bottom Text matching Figma [385:2167] */}
         <div className="text-center mt-12 sm:mt-16">
@@ -151,7 +171,13 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
             className="text-[14px] sm:text-[15px] font-medium text-[#5E7165]"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            Don’t see your school? Ask your registry to bring ClearUs to your campus.
+            Don’t see your school? Ask your registry to{' '}
+            <Link
+              href="/request-school"
+              className="text-[#16A34A] underline underline-offset-2 hover:text-[#15803D] font-semibold"
+            >
+              bring ClearUs to your campus
+            </Link>.
           </p>
         </div>
       </div>
