@@ -14,6 +14,7 @@ interface SidebarProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
   unreadCount?: number;
+  className?: string;
 }
 
 /* ─── FILLED Nav Icons ─── */
@@ -177,6 +178,7 @@ export default function StudentSidebar({
   collapsed,
   onToggleCollapse,
   unreadCount = 2,
+  className,
 }: SidebarProps) {
   const router = useRouter();
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
@@ -188,7 +190,7 @@ export default function StudentSidebar({
   };
   return (
     <aside
-      className={`shrink-0 bg-[#F7FBF8] flex flex-col h-screen border-r-[1.2px] relative border-[#E2EBE5] transition-all duration-200 ${collapsed ? 'w-18' : 'w-69.25'
+      className={`shrink-0 bg-[#F7FBF8] flex flex-col border-r-[1.2px] relative border-[#E2EBE5] transition-all duration-200 ${className ?? 'h-screen'} ${collapsed ? 'w-18' : 'w-69.25'
         }`}
     >
       {/* Logo + collapse */}

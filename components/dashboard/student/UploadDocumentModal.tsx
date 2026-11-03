@@ -138,9 +138,9 @@ export default function UploadDocumentModal({
       />
 
       {/* Modal Dialog matching Figma [205:4267] (520x549, r=20, fill=#FFFFFF) */}
-      <div className="relative w-full max-w-[520px] rounded-[20px] bg-white shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+      <div className="relative w-full max-w-130 rounded-[20px] bg-white shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col">
         {/* Header [205:4268] (520x98, pad=[22,24,22,24], gap=14) */}
-        <div className="flex items-start justify-between px-6 py-[22px] border-b border-[#F0F4F1] shrink-0">
+        <div className="flex items-start justify-between px-6 py-5.5 border-b border-[#F0F4F1] shrink-0">
           <div className="flex items-center gap-3.5 min-w-0">
             {/* Icon [205:4269] 44x44, r=12, fill=#F0FDF4 */}
             <div className="w-11 h-11 rounded-xl bg-[#F0FDF4] flex items-center justify-center shrink-0">
@@ -197,7 +197,7 @@ export default function UploadDocumentModal({
         <div className="p-6 pt-5 space-y-4">
           {/* Source Tabs [205:4280] (472x54, r=12, fill=#F7FBF8, stroke=#E2EBE5) */}
           {allowVault && (
-            <div className="flex h-[54px] p-1 rounded-xl bg-[#F7FBF8] border border-[#E2EBE5] gap-1">
+            <div className="flex h-13.5 p-1 rounded-xl bg-[#F7FBF8] border border-[#E2EBE5] gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('upload')}
@@ -288,7 +288,7 @@ export default function UploadDocumentModal({
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`min-h-[222px] border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all ${
+              className={`min-h-55.5 border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all ${
                 isDragging
                   ? 'border-[#15803D] bg-[#DCFCE7]/30'
                   : selectedFile
@@ -305,7 +305,7 @@ export default function UploadDocumentModal({
               />
 
               {/* Icon [205:4292] 52x52, r=999, fill=#DCFCE7 */}
-              <div className="w-[52px] h-[52px] rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] mb-2 shrink-0">
+              <div className="w-13 h-13 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] mb-2 shrink-0">
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
                   <path
                     d="M10 13V4M10 4L6.5 7.5M10 4L13.5 7.5"
@@ -351,7 +351,7 @@ export default function UploadDocumentModal({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="h-[42px] px-5 py-2.5 rounded-xl border border-[#16A34A] bg-white text-[14px] font-semibold text-[#15803D] hover:bg-[#F7FBF8] transition-colors cursor-pointer shadow-xs font-sans"
+                    className="h-10.5 px-5 py-2.5 rounded-xl border border-[#16A34A] bg-white text-[14px] font-semibold text-[#15803D] hover:bg-[#F7FBF8] transition-colors cursor-pointer shadow-xs font-sans"
                   >
                     Browse files
                   </button>

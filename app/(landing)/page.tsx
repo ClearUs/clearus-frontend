@@ -4,17 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { Institution } from '@/types/index';
-import Hero from '@/views/Landing/hero';
-import SearchGateway from '@/views/Landing/search-gateway';
-import RecentInstitution from '@/views/Landing/recent-institution';
-import Features from '@/views/Landing/features';
+import HeroSection from '@/views/Landing/HeroSection';
+import HowItWorksSection from '@/views/Landing/HowItWorksSection';
+import FeaturesSection from '@/views/Landing/FeaturesSection';
+import StudentsSection from '@/views/Landing/StudentsSection';
+import FindYourSchoolSection from '@/views/Landing/FindYourSchoolSection';
+import ForSchoolsSection from '@/views/Landing/ForSchoolsSection';
+import FaqSection from '@/views/Landing/FaqSection';
+import FinalCtaSection from '@/views/Landing/FinalCtaSection';
+import FooterSection from '@/views/Landing/FooterSection';
 import RedirectionSplash from '@/views/Redirect/redirection-splash';
 
 export default function LandingPage() {
     const router = useRouter();
     const [viewState, setViewState] = useState<'directory' | 'redirect'>('directory');
     const [selectedSchool, setSelectedSchool] = useState<Institution | null>(null);
-    const [recentCodes, setRecentCodes] = useState<string[]>([]);
+    const [_recentCodes, setRecentCodes] = useState<string[]>([]);
 
     // Load recently accessed codes from localStorage on client-side initialization
     useEffect(() => {
@@ -65,24 +70,47 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="flex-1 w-full flex flex-col justify-center min-h-[calc(100vh-180px)]">
+        <div className="w-full min-h-screen flex flex-col bg-white">
             <AnimatePresence mode="wait">
                 {viewState === 'directory' && (
                     <div key="directory-view" className="w-full flex flex-col items-center">
-                        <main className="flex-1 w-full max-w-6xl mx-auto px-6 md:px-12 py-12 flex flex-col items-center justify-center z-10">
-                            <Hero />
-                            <SearchGateway
-                                setRecentCodes={setRecentCodes}
-                                handleSelectWithRecent={handleSelectWithRecent}
+                        <main className="w-full flex flex-col">
+                            {/* Section 1: Hero, Navbar & Value Strip */}
+                            <HeroSection
+                                onFindSchoolClick={() => {
+                                    const el = document.getElementById('find-school');
+                                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                }}
                             />
-                            {recentCodes.length > 0 && (
-                                <RecentInstitution
-                                    recentCodes={recentCodes}
-                                    setRecentCodes={setRecentCodes}
-                                    handleSelectWithRecent={handleSelectWithRecent}
-                                />
-                            )}
-                            <Features />
+
+                            {/* Section 2: How It Works [385:357] */}
+                            <HowItWorksSection />
+
+                            {/* Section 3: Features Bento Grid [385:661] */}
+                            <FeaturesSection />
+
+                            {/* Section 4: Students Section [427:3298] */}
+                            <StudentsSection />
+
+                            {/* Section 5: Find Your School [385:2134] */}
+                            <FindYourSchoolSection onSelectSchool={handleSelectWithRecent} />
+
+                            {/* Section 6: For Schools [385:2168] */}
+                            <ForSchoolsSection />
+
+                            {/* Section 7: FAQ [385:2201] */}
+                            <FaqSection />
+
+                            {/* Section 8: Final CTA [385:2233] */}
+                            <FinalCtaSection
+                                onFindSchoolClick={() => {
+                                    const el = document.getElementById('find-school');
+                                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                            />
+
+                            {/* Section 9: Footer [385:2289] */}
+                            <FooterSection />
                         </main>
                     </div>
                 )}
