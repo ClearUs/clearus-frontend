@@ -54,7 +54,7 @@ export default function FooterSection() {
               className="text-[15px] text-[#5E7165] leading-5.5"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Graduation clearance for Nigerian universities, fully online.
+              Academic clearance for Nigerian universities, fully online.
             </p>
           </div>
 
@@ -144,12 +144,12 @@ export default function FooterSection() {
             </h3>
             <ul className="flex flex-col gap-2.5 text-[15px]" style={{ fontFamily: 'Inter, sans-serif' }}>
               <li>
-                <a
-                  href="mailto:partnerships@clearus.tech?subject=ClearUs%20for%20our%20institution"
+                <Link
+                  href="/request-school"
                   className="text-[#5E7165] hover:text-[#15803D] transition-colors"
                 >
                   Bring ClearUs to your school
-                </a>
+                </Link>
               </li>
               <li>
                 <a

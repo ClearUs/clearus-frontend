@@ -60,6 +60,21 @@ function BellIcon() {
   );
 }
 
+function ClearUsLogo() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="url(#header_clearus_linear)" />
+      <path d="M29.15 18.1514V23.6514M14.4834 20.4431V23.6514C14.4834 25.2098 16.9584 26.4014 19.9834 26.4014C23.0084 26.4014 25.4834 25.2098 25.4834 23.6514V20.4431M11.3667 17.3264L19.25 13.7514C19.4813 13.6505 19.731 13.5984 19.9834 13.5984C20.2358 13.5984 20.4854 13.6505 20.7167 13.7514L28.6 17.3264C28.755 17.4015 28.8857 17.5187 28.9772 17.6646C29.0686 17.8105 29.1171 17.9792 29.1171 18.1514C29.1171 18.3236 29.0686 18.4924 28.9772 18.6383C28.8857 18.7842 28.755 18.9014 28.6 18.9764L20.7167 22.5514C20.4854 22.6524 20.2358 22.7045 19.9834 22.7045C19.731 22.7045 19.4813 22.6524 19.25 22.5514L11.3667 18.9764C11.2117 18.9014 11.081 18.7842 10.9896 18.6383C10.8981 18.4924 10.8496 18.3236 10.8496 18.1514C10.8496 17.9792 10.8981 17.8105 10.9896 17.6646C11.081 17.5187 11.2117 17.4015 11.3667 17.3264Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="#DCFCE7" />
+      <defs>
+        <linearGradient id="header_clearus_linear" x1="0" y1="0" x2="28.2885" y2="28.2885" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#16A34A" />
+          <stop offset="1" stopColor="#15803D" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
 interface HeaderBarProps {
   institution: Institution;
   onNavigate?: (section: string) => void;
@@ -69,11 +84,12 @@ interface HeaderBarProps {
 
 export default function HeaderBar({ institution, onNavigate, unreadCount = 2, className }: HeaderBarProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const isDemo = institution.code === 'DEMO' || institution.name.toLowerCase().includes('demo');
   const crestSrc = crestMap[institution.code] ?? crestMap.FUTO;
-  const domain = `${institution.code.toLowerCase()}.clearus.tech`;
+  const domain = institution.domain ?? (isDemo ? 'youruniversity.clearus.tech' : `${institution.code.toLowerCase()}.clearus.tech`);
 
   return (
-    <header className={`h-16 bg-white border-b border-[#E2EBE5] flex items-center justify-between px-4 sm:px-6 shrink-0 ${className ?? ''}`}>
+    <header className={`h-16 bg-white border-b border-[#E2EBE5] flex items-center justify-between px-3 sm:px-6 shrink-0 ${className ?? ''}`}>
       {/* Search */}
       <div className="relative flex-1 max-w-110">
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
@@ -88,9 +104,9 @@ export default function HeaderBar({ institution, onNavigate, unreadCount = 2, cl
       </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Theme toggle group */}
-        <div className="flex items-center bg-white border border-[#E2EBE5] rounded-xl p-1 gap-0.5">
+        <div className="hidden sm:flex items-center bg-white border border-[#E2EBE5] rounded-xl p-1 gap-0.5">
           <button
             onClick={() => setTheme('dark')}
             className={`w-9 h-9 rounded-lg flex items-center cursor-pointer justify-center transition-colors ${theme === 'dark' ? 'bg-[#15803D1A]' : 'hover:bg-white/60'
@@ -113,7 +129,7 @@ export default function HeaderBar({ institution, onNavigate, unreadCount = 2, cl
           onClick={() => {
             window.open('mailto:registry@clearus.tech?subject=Clearance%20Support%20Request', '_blank');
           }}
-          className="w-9 h-9 rounded-xl cursor-pointer border border-[#E2EBE5] bg-white flex items-center justify-center hover:bg-[#F9FAFB] transition-colors"
+          className="hidden sm:flex w-9 h-9 rounded-xl cursor-pointer border border-[#E2EBE5] bg-white items-center justify-center hover:bg-[#F9FAFB] transition-colors"
           title="Need help?"
         >
           <HelpCircleIcon />
@@ -133,21 +149,25 @@ export default function HeaderBar({ institution, onNavigate, unreadCount = 2, cl
         </button>
 
         {/* University crest + name */}
-        <div className="flex items-center gap-2.5 ml-2 pl-3 border-l border-[#E2EBE5]">
-          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-white">
-            <Image
-              src={crestSrc}
-              alt={`${institution.name} crest`}
-              width={36}
-              height={36}
-              className="w-full h-full object-contain"
-            />
+        <div className="flex items-center gap-2 sm:gap-2.5 ml-1 sm:ml-2 pl-2 sm:pl-3 border-l border-[#E2EBE5]">
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-white flex items-center justify-center">
+            {isDemo ? (
+              <ClearUsLogo />
+            ) : (
+              <Image
+                src={crestSrc}
+                alt={`${institution.name} crest`}
+                width={36}
+                height={36}
+                className="w-full h-full object-contain"
+              />
+            )}
           </div>
           <div className="flex flex-col">
-            <span className="text-[13px] font-semibold text-[#13241A] leading-tight font-jakarta" >
+            <span className="text-[12px] sm:text-[13px] font-semibold text-[#13241A] leading-tight font-jakarta whitespace-nowrap">
               {institution.name}
             </span>
-            <span className="text-[11px] text-[#15803D] leading-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-[10px] sm:text-[11px] text-[#15803D] leading-tight whitespace-nowrap" style={{ fontFamily: 'Inter, sans-serif' }}>
               {domain}
             </span>
           </div>

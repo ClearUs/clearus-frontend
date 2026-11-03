@@ -1,7 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
+
+function ClearUsLogo({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="url(#cert_clearus_linear)" />
+      <path d="M29.15 18.1514V23.6514M14.4834 20.4431V23.6514C14.4834 25.2098 16.9584 26.4014 19.9834 26.4014C23.0084 26.4014 25.4834 25.2098 25.4834 23.6514V20.4431M11.3667 17.3264L19.25 13.7514C19.4813 13.6505 19.731 13.5984 19.9834 13.5984C20.2358 13.5984 20.4854 13.6505 20.7167 13.7514L28.6 17.3264C28.755 17.4015 28.8857 17.5187 28.9772 17.6646C29.0686 17.8105 29.1171 17.9792 29.1171 18.1514C29.1171 18.3236 29.0686 18.4924 28.9772 18.6383C28.8857 18.7842 28.755 18.9014 28.6 18.9764L20.7167 22.5514C20.4854 22.6524 20.2358 22.7045 19.9834 22.7045C19.731 22.7045 19.4813 22.6524 19.25 22.5514L11.3667 18.9764C11.2117 18.9014 11.081 18.7842 10.9896 18.6383C10.8981 18.4924 10.8496 18.3236 10.8496 18.1514C10.8496 17.9792 10.8981 17.8105 10.9896 17.6646C11.081 17.5187 11.2117 17.4015 11.3667 17.3264Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="#DCFCE7" />
+      <defs>
+        <linearGradient id="cert_clearus_linear" x1="0" y1="0" x2="28.2885" y2="28.2885" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#16A34A" />
+          <stop offset="1" stopColor="#15803D" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 export default function FeaturesSection() {
   // Micro-interactions state
@@ -13,13 +27,13 @@ export default function FeaturesSection() {
   const [vaultSearch, setVaultSearch] = useState('');
 
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText('https://futo.clearus.tech/verify/CLR-LIB-104928');
+    navigator.clipboard?.writeText('https://youruniversity.clearus.tech/verify/CLR-LIB-104928');
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
   return (
-    <section id="features" className="w-full bg-white py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden">
+    <section id="features" className="w-full bg-white py-16 sm:py-20 lg:py-24 border-t border-[#E2EBE5]/60 overflow-hidden scroll-mt-20 sm:scroll-mt-24">
       <div className="w-full max-w-312 mx-auto px-4 sm:px-6">
         {/* Section Heading matching Figma [385:662] (NO EYEBROW - visible: false in Figma) */}
         <div className="max-w-205 mx-auto text-center mb-12 sm:mb-16">
@@ -742,20 +756,15 @@ export default function FeaturesSection() {
                     <div className="md:col-span-7 rounded-xl border border-[#E2EBE5] bg-white p-3 shadow-2xs">
                       {/* Inner Decorative Green Border [385:1846] */}
                       <div className="rounded-lg border border-[#16A34A] p-3 flex flex-col items-center text-center gap-1.5 bg-[#FAFDFB]">
-                        {/* University Crest */}
-                        <div className="relative w-7 h-7 shrink-0">
-                          <Image
-                            src="/images/futo-crest.png"
-                            alt="FUTO Crest"
-                            fill
-                            className="object-contain"
-                          />
+                        {/* ClearUs Logo replacing university crest */}
+                        <div className="relative w-7 h-7 shrink-0 flex items-center justify-center">
+                          <ClearUsLogo size={28} />
                         </div>
 
                         {/* Certificate Header */}
                         <div>
-                          <span className="text-[7px] font-bold tracking-widest text-[#13241A] uppercase block">
-                            FEDERAL UNIVERSITY OF TECHNOLOGY, OWERRI
+                          <span className="text-[7.5px] font-bold tracking-widest text-[#13241A] uppercase block">
+                            DEMO UNIVERSITY
                           </span>
                           <span className="text-[12px] font-bold text-[#13241A] font-jakarta block">
                             Certificate of Clearance
@@ -842,7 +851,7 @@ export default function FeaturesSection() {
                           Employers or other schools can confirm this certificate is genuine using the link below.
                         </p>
                         <div className="flex items-center justify-between gap-1 p-1 bg-[#F7FBF8] border border-[#E2EBE5] rounded text-[7.5px] font-mono text-[#5E7165]">
-                          <span className="truncate">futo.clearus.tech/verify/CLR-LIB-104928</span>
+                          <span className="truncate">youruniversity.clearus.tech/verify/CLR-LIB-104928</span>
                           <button
                             onClick={handleCopyLink}
                             className="text-[#16A34A] hover:text-[#15803D] shrink-0 font-medium"

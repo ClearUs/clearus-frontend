@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { Institution } from '@/types/index';
+import LandingNavbar from '@/views/Landing/Navbar';
 import HeroSection from '@/views/Landing/HeroSection';
 import HowItWorksSection from '@/views/Landing/HowItWorksSection';
 import FeaturesSection from '@/views/Landing/FeaturesSection';
@@ -74,8 +75,16 @@ export default function LandingPage() {
             <AnimatePresence mode="wait">
                 {viewState === 'directory' && (
                     <div key="directory-view" className="w-full flex flex-col items-center">
+                        {/* Fixed Navbar on scroll */}
+                        <LandingNavbar
+                            onFindSchoolClick={() => {
+                                const el = document.getElementById('find-school');
+                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                        />
+
                         <main className="w-full flex flex-col">
-                            {/* Section 1: Hero, Navbar & Value Strip */}
+                            {/* Section 1: Hero & Value Strip */}
                             <HeroSection
                                 onFindSchoolClick={() => {
                                     const el = document.getElementById('find-school');

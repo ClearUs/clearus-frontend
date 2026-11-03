@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface NavbarProps {
@@ -19,11 +19,22 @@ function ClearUsLogo() {
         </linearGradient>
       </defs>
     </svg>
-  )
+  );
 }
 
 export default function LandingNavbar({ onFindSchoolClick }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -32,25 +43,29 @@ export default function LandingNavbar({ onFindSchoolClick }: NavbarProps) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
-  
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 sm:px-6 pt-5 pb-3 bg-transparent transition-all">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full px-4 sm:px-6 transition-all duration-300 ${
+        isScrolled || mobileMenuOpen
+          ? 'bg-white/90 backdrop-blur-md border-b border-[#E2EBE5]/70 shadow-xs py-2.5 sm:py-3'
+          : 'bg-transparent border-b border-transparent py-4 sm:py-5'
+      }`}
+    >
       {/* Nav bar matching Figma [385:2319] (1120x72, transparent background, no border, no card shadow) */}
-      <div className="w-full max-w-280 mx-auto h-18 px-2 sm:px-6 flex items-center justify-between">
+      <div className="w-full max-w-280 mx-auto h-16 sm:h-18 px-2 sm:px-6 flex items-center justify-between">
         {/* Logo [385:2320] */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
           {/* Logo Tile [385:2321] (40x40, r=12) */}
           <div className="flex items-center gap-2">
-              <ClearUsLogo />
-              <div className="flex flex-col">
-                <span className="text-[16px] font-bold tracking-tight text-[#13241A] font-jakarta">
-                  Clear<span className="text-[#15803D]">Us</span>
-                </span>
-                <span className="text-[8px] text-[#8A9A90] leading-none font-sans">Academic Network</span>
-              </div>
+            <ClearUsLogo />
+            <div className="flex flex-col">
+              <span className="text-[16px] font-bold tracking-tight text-[#13241A] font-jakarta">
+                Clear<span className="text-[#15803D]">Us</span>
+              </span>
+              <span className="text-[8px] text-[#8A9A90] leading-none font-sans">Academic Network</span>
             </div>
-          
+          </div>
         </Link>
 
         {/* Desktop Links [385:2326] (gap=32) */}
@@ -120,7 +135,7 @@ export default function LandingNavbar({ onFindSchoolClick }: NavbarProps) {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg text-[#13241A] hover:bg-black/5"
+          className="md:hidden p-2 rounded-lg text-[#13241A] hover:bg-black/5 cursor-pointer"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
@@ -137,7 +152,7 @@ export default function LandingNavbar({ onFindSchoolClick }: NavbarProps) {
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-2 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-[#E2EBE5] shadow-lg flex flex-col gap-3">
+        <div className="md:hidden mt-2 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-[#E2EBE5] shadow-lg flex flex-col gap-3 max-w-280 mx-auto">
           <button
             type="button"
             onClick={() => scrollToSection('how-it-works')}
@@ -182,7 +197,7 @@ export default function LandingNavbar({ onFindSchoolClick }: NavbarProps) {
                 if (onFindSchoolClick) onFindSchoolClick();
                 else scrollToSection('find-school');
               }}
-              className="w-full py-3 rounded-xl bg-[#14532D] text-white text-[14px] font-semibold text-center"
+              className="w-full py-3 rounded-xl bg-[#14532D] text-white text-[14px] font-semibold text-center cursor-pointer"
             >
               Find your university
             </button>

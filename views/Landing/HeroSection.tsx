@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import LandingNavbar from './Navbar';
 import HeroDashboardMockup from './HeroDashboardMockup';
 
 interface HeroSectionProps {
@@ -60,11 +59,8 @@ export default function HeroSection({
           }}
         />
 
-        {/* Transparent Navbar matching Figma [385:2318] sitting on top of Frame 63 gradient */}
-        <LandingNavbar onFindSchoolClick={handleFindSchool} />
-
-        {/* Headline Block matching Figma [385:22] (828x348, centered, NO BADGE) */}
-        <div className="relative z-10 max-w-207] mx-auto text-center px-4 sm:px-6 pt-8 sm:pt-12">
+        {/* Headline Block matching Figma [385:22] (828x348, centered, NO BADGE, top padded for fixed navbar) */}
+        <div className="relative z-10 max-w-207 mx-auto text-center px-4 sm:px-6 pt-24 sm:pt-28 lg:pt-32">
           {/* Heading [385:27] (Plus Jakarta Sans Bold 68px, lh:76px, color #13241A) */}
           <h1 className="text-[36px] sm:text-[54px] lg:text-[68px] font-bold text-[#13241A] font-jakarta leading-[1.12] tracking-[-1.36px] text-center mb-5 sm:mb-6">
             Complete your clearance,{' '}
@@ -85,11 +81,10 @@ export default function HeroSection({
             <button
               type="button"
               onClick={handleFindSchool}
-              className="w-full sm:w-50.25 h-14 rounded-xl bg-[#16A34A] hover:bg-[#15803D] text-white text-[16px] font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
+              className="w-full sm:w-50.25 h-14 rounded-xl bg-[#16A34A] hover:bg-[#15803D] text-white text-[16px] font-semibold inline-flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              <span>Find your university</span>
-              <span className="text-[18px]">→</span>
+              Find your university
             </button>
 
             {/* Secondary CTA [385:33] (190x56, r=12, stroke=#c9d8ce) */}
@@ -109,7 +104,7 @@ export default function HeroSection({
           {/* Floating Chip 1: Top Right matching Figma [385:335] (top: 76px, right edge, 290x50, r=999) */}
           <div
             onClick={() => showToast('Vault item: Bursary receipt attached to clearance')}
-            className="absolute top-2 sm:top-19 -right-2 sm:-right-4 lg:-right-6 z-30 animate-float-gentle cursor-pointer group"
+            className="absolute -top-3.5 sm:top-19 right-1 sm:-right-4 lg:-right-6 z-30 animate-float-gentle cursor-pointer group scale-85 sm:scale-100 origin-top-right"
             title="Click to interact"
           >
             <div className="rounded-full bg-white border border-[#E2EBE5] shadow-[0_16px_40px_-6px_rgba(20,83,45,0.22)] group-hover:shadow-2xl px-4 py-2.5 sm:py-3 flex items-center gap-2.5 transition-all group-hover:scale-105 group-hover:border-[#16A34A]/50">
@@ -125,10 +120,10 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* Floating Chip 2: Left Side matching Figma [385:339] (top: 180px, left edge - slightly below Chip 1!) */}
+          {/* Floating Chip 2: Left Side matching Figma [385:339] (bottom on mobile, top: 180px on desktop) */}
           <div
             onClick={() => showToast('Library clearance certificate downloaded!')}
-            className="absolute top-16 sm:top-45 -left-2 sm:-left-4 lg:-left-6 z-30 animate-float-reverse cursor-pointer group"
+            className="absolute -bottom-3.5 sm:bottom-auto sm:top-45 left-1 sm:-left-4 lg:-left-6 z-30 animate-float-reverse cursor-pointer group scale-85 sm:scale-100 origin-bottom-left"
             title="Click to interact"
           >
             <div className="rounded-full bg-white border border-[#E2EBE5] shadow-[0_16px_40px_-6px_rgba(20,83,45,0.22)] group-hover:shadow-2xl px-4 py-2.5 sm:py-3 flex items-center gap-2.5 transition-all group-hover:scale-105 group-hover:border-[#16A34A]/50">
@@ -147,7 +142,7 @@ export default function HeroSection({
           {/* Product Shot Outer Border Container [385:36] (1184x666, r=30, fill=#F0FDF4/45, stroke=#FFFFFF) */}
           <div className="rounded-[26px] sm:rounded-[30px] p-2 sm:p-3 bg-[#F0FDF4]/45 border border-white shadow-2xl backdrop-blur-xs">
             {/* Student Dashboard Frame [385:37] powered by actual live dashboard components */}
-            <div className="rounded-[18px] sm:rounded-[20px] bg-white border border-[#E2EBE5] shadow-xs overflow-hidden h-150 flex relative">
+            <div className="rounded-[18px] sm:rounded-[20px] bg-white border border-[#E2EBE5] shadow-xs overflow-hidden h-125 sm:h-145 lg:h-150 flex relative">
               <HeroDashboardMockup onShowToast={showToast} />
             </div>
           </div>

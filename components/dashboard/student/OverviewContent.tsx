@@ -38,8 +38,8 @@ const MOCK_CLEARANCES: ClearanceStep[] = [
     department: 'University Library Services',
     officer: 'Librarian Musa',
     status: 'approved',
-    stepsCompleted: 1,
-    stepsTotal: 1,
+    stepsCompleted: 2,
+    stepsTotal: 2,
   },
   {
     id: 'department',
@@ -47,8 +47,8 @@ const MOCK_CLEARANCES: ClearanceStep[] = [
     title: 'Department Clearance',
     department: 'Computer Science',
     officer: 'Head of Department',
-    status: 'action_required',
-    stepsCompleted: 1,
+    status: 'approved',
+    stepsCompleted: 2,
     stepsTotal: 2,
     documents: [
       { id: 'dept-handover', name: 'Upload departmental handover form', description: 'Signed handover form · Returned' },
@@ -374,7 +374,7 @@ export default function OverviewContent({
         {/* Welcome hero */}
         <div className="rounded-2xl overflow-hidden relative p-6 mb-8 border border-[#E2EBE5] bg-white">
           <Image src="/images/hero-banner.png" alt="banner" width={808} height={420} className="absolute left-0 top-0 h-full" />
-          <div className="flex items-start justify-between relative z-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
             <div className="flex-1">
               <p
                 className="text-[12px] font-medium uppercase mb-2"
@@ -465,7 +465,7 @@ export default function OverviewContent({
       </div>
 
       {/* Right sidebar */}
-      <div className="w-75 shrink-0 overflow-y-auto px-5 py-6 space-y-5">
+      <div className="hidden lg:block w-72 2xl:w-75 shrink-0 overflow-y-auto px-4 lg:px-5 py-6 space-y-5">
         {/* Recent activity */}
         <div className="bg-white rounded-2xl border border-[#E2EBE5] p-5">
           <div className="flex items-center justify-between mb-4">
