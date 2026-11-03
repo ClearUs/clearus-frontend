@@ -184,6 +184,37 @@ export const INSTITUTIONS: Institution[] = [
       pendingClearances: 520,
       clearedThisMonth: 2150
     }
+  },
+  {
+    code: 'OAU',
+    name: 'Obafemi Awolowo University',
+    shortName: 'OAU',
+    motto: 'For Learning and Culture',
+    primaryColor: 'blue',
+    accentColor: 'amber',
+    colorTheme: {
+      primaryBg: 'bg-blue-600',
+      primaryText: 'text-blue-400',
+      primaryBorder: 'border-blue-500/20',
+      accentBg: 'bg-amber-500',
+      accentText: 'text-amber-400',
+      bannerGradient: 'from-slate-950 via-neutral-950 to-blue-950',
+      lightAccentBg: 'bg-blue-950/20 text-blue-400 border-blue-500/20',
+    },
+    allowedDomains: ['oauife.edu.ng', 'student.oauife.edu.ng'],
+    departments: [
+      'Computer Science and Engineering',
+      'Law',
+      'Pharmacy',
+      'Medicine',
+      'Economics',
+      'Civil Engineering'
+    ],
+    stats: {
+      totalStudents: 26000,
+      pendingClearances: 1800,
+      clearedThisMonth: 4800
+    }
   }
 ];
 

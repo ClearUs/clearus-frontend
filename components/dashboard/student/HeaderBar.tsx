@@ -64,15 +64,16 @@ interface HeaderBarProps {
   institution: Institution;
   onNavigate?: (section: string) => void;
   unreadCount?: number;
+  className?: string;
 }
 
-export default function HeaderBar({ institution, onNavigate, unreadCount = 2 }: HeaderBarProps) {
+export default function HeaderBar({ institution, onNavigate, unreadCount = 2, className }: HeaderBarProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const crestSrc = crestMap[institution.code] ?? crestMap.FUTO;
   const domain = `${institution.code.toLowerCase()}.clearus.tech`;
 
   return (
-    <header className="h-16 bg-white border-b border-[#E2EBE5] flex items-center justify-between px-6 shrink-0">
+    <header className={`h-16 bg-white border-b border-[#E2EBE5] flex items-center justify-between px-4 sm:px-6 shrink-0 ${className ?? ''}`}>
       {/* Search */}
       <div className="relative flex-1 max-w-110">
         <div className="absolute left-3 top-1/2 -translate-y-1/2">

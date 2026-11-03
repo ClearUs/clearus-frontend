@@ -301,7 +301,7 @@ export default function TimelineContent({
                 <div key={event.id} className="relative">
                   {/* Timeline bullet icon */}
                   <div
-                    className={`absolute -left-[35px] top-0 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-xs ${
+                    className={`absolute -left-8.75 top-0 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-xs ${
                       isApproval
                         ? 'bg-[#16A34A]'
                         : isReturned

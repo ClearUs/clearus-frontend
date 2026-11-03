@@ -13,6 +13,8 @@ interface OverviewContentProps {
     docDescription?: string;
   }) => void;
   onSelectClearance?: (clearanceId: string, stepId?: string) => void;
+  padding?: string
+  textSize?: string
 }
 
 interface ClearanceStep {
@@ -357,6 +359,8 @@ export default function OverviewContent({
   onNavigate,
   onOpenUploadModal,
   onSelectClearance,
+  padding,
+  textSize,
 }: OverviewContentProps) {
   const firstName = user.name.split(' ')[0];
   const approvedCount = MOCK_CLEARANCES.filter((c) => c.status === 'approved').length;
@@ -405,7 +409,7 @@ export default function OverviewContent({
                       docDescription: 'Payment receipt · PDF, JPG or PNG',
                     })
                   }
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#15803D] text-white text-[14px] font-semibold rounded-lg hover:bg-[#14532D] transition-colors cursor-pointer shadow-xs"
+                  className={`inline-flex items-center gap-2 ${padding || 'px-5 py-2.5'} bg-[#15803D] text-white ${textSize || 'text-[14px]'} font-semibold rounded-lg hover:bg-[#14532D] transition-colors cursor-pointer shadow-xs`}
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   Continue: Upload payment receipt
@@ -414,7 +418,7 @@ export default function OverviewContent({
                 <button
                   type="button"
                   onClick={() => onNavigate?.('clearances')}
-                  className="text-[14px] font-medium text-[#15803D] hover:underline cursor-pointer"
+                  className={`text-[14px] font-medium text-[#15803D] hover:underline cursor-pointer ${textSize || 'text-[14px]'}`}
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   View all clearances
