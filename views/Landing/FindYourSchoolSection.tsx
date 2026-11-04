@@ -7,7 +7,7 @@ import { Institution } from '@/types';
 // import UniversityCrest from '@/components/landing/UniversityCrest';
 
 interface FindYourSchoolSectionProps {
-  onSelectSchool: (school: Institution) => void;
+  onSelectSchool?: (school: Institution) => void;
 }
 
 export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchoolSectionProps) {
@@ -34,9 +34,10 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
 
   const handleSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (filteredInstitutions.length > 0) {
-      onSelectSchool(filteredInstitutions[0]);
-    }
+    // Submission paused while universities are not yet onboarded
+    // if (onSelectSchool && filteredInstitutions.length > 0) {
+    //   onSelectSchool(filteredInstitutions[0]);
+    // }
   };
 
   return (
@@ -74,6 +75,11 @@ export default function FindYourSchoolSection({ onSelectSchool }: FindYourSchool
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
               placeholder="Search your university"
               className="w-full bg-transparent text-[15px] sm:text-[16px] text-[#13241A] placeholder-[#8A9A90] focus:outline-none"
               style={{ fontFamily: 'Inter, sans-serif' }}
